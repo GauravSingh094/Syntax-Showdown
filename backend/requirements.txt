@@ -1,0 +1,11 @@
+fastapi>=0.111
+uvicorn[standard]
+httpx
+langgraph
+python-jose[cryptography]
+chromadb
+pydantic-settings
+python-dotenv
+mcp
+pytest
+pytest-asyncio
