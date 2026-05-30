@@ -1,4 +1,4 @@
-import asyncio, logging
+import logging
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from app.llm.ollama_client import check_model_availability

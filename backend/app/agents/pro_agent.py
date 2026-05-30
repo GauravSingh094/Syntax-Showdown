@@ -5,7 +5,12 @@ class ProAgent(BaseAgent):
     def __init__(self):
         super().__init__(model=settings.PRO_MODEL, role="Pro")
 
-    def _build_prompt(self, topic: str, history: str) -> str:
+    def _build_prompt(self, topic: str, history: str, mode: str = "classic", *args, **kwargs) -> str:
         return f"""You are arguing IN FAVOR of: "{topic}"
-Prior debate:\n{history}
-Give a concise, persuasive argument (3-5 sentences). No preamble."""
+Prior debate flow:\n{history}
+
+Respond to the latest counter-point. 
+MANDATORY: 
+1. Use 2-3 small bullet points for your core arguments.
+2. Be concise and intellectual. 
+3. No preamble."""

@@ -2,18 +2,20 @@ import json, uuid, asyncio
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from app.orchestrator.state import DebateState
-from app.orchestrator.orchestrator import pro_node, opponent_node, judge_node, debate_graph
+from app.orchestrator.orchestrator import pro_node, opponent_node, judge_node
 from app.auth.clerk_middleware import get_current_user
 from app.core.security import validate_topic
 from app.memory.chromadb_client import store_debate
 from app.core.rate_limiter import check_rate_limit
 from pydantic import BaseModel
+from app.agents.side_agent import SideAgent
 
 router = APIRouter()
+side_agent = SideAgent()
 
 class DebateRequest(BaseModel):
     topic: str
-    rounds: int = 3
+    rounds: int = 3 # Minimum 1 round (Pro + Opponent) required for fair adjudication
     mode: str = "classic"
 
 @router.post("/debate")
@@ -29,6 +31,10 @@ async def start_debate(req: DebateRequest, user=Depends(get_current_user)):
             history=[], rounds_data=[], verdict=None, done=False
         )
         try:
+            sides = await side_agent.get_sides(topic)
+            yield f'data: {json.dumps({"type":"sides","content":sides})}\n\n'
+            await asyncio.sleep(0)
+
             for round_num in range(1, req.rounds + 1):
                 state = await pro_node(state)
                 pro_text = state["rounds_data"][round_num - 1]["pro"]
@@ -40,6 +46,7 @@ async def start_debate(req: DebateRequest, user=Depends(get_current_user)):
                 yield f'data: {json.dumps({"type":"opponent","round":round_num,"content":opp_text})}\n\n'
                 await asyncio.sleep(0)
 
+            yield f'data: {json.dumps({"type":"judge_start"})}\n\n'
             state = await judge_node(state)
             yield f'data: {json.dumps({"type":"judge","content":state["verdict"]})}\n\n'
 

@@ -9,14 +9,18 @@ def _get_timeout(model: str) -> float:
     # Large models can take a while to load on first run
     return 180.0
 
-async def generate(prompt: str, model: str, retries: int = 3) -> str:
+async def generate(prompt: str, model: str, retries: int = 3, format: str = None) -> str:
+    model = model.lower() # Ollama model names are case-insensitive and usually lowercase
     timeout = _get_timeout(model)
     for attempt in range(retries):
         try:
             async with httpx.AsyncClient(timeout=timeout) as client:
+                payload = {"model": model, "prompt": prompt, "stream": False}
+                if format:
+                    payload["format"] = format
                 response = await client.post(
                     f"{settings.OLLAMA_URL}/api/generate",
-                    json={"model": model, "prompt": prompt, "stream": False}
+                    json=payload
                 )
                 response.raise_for_status()
                 data = response.json()

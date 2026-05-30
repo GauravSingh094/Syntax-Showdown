@@ -2,9 +2,14 @@
 @import "tailwindcss";
 
 :root {
+  --background: #fdfdfd;
+  --foreground: #0a0a0a;
+  --pixel-size: 4px;
+}
+
+.dark {
   --background: #030303;
   --foreground: #f0f0f0;
-  --pixel-size: 4px;
 }
 
 @theme inline {
@@ -25,9 +30,15 @@ body {
 /* Pixel Grid Background */
 .pixel-grid {
   background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.dark .pixel-grid {
+  background-image: 
     linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  background-size: 20px 20px;
 }
 
 /* CRT Scanlines Effect */
@@ -79,14 +90,32 @@ body {
   box-shadow: inset 4px 4px 0px 0px rgba(0,0,0,0.3);
 }
 
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-shimmer {
+  animation: shimmer 5s infinite linear;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #030303;
+  background: var(--background);
 }
 ::-webkit-scrollbar-thumb {
   background: #6366f1;
-  border: 2px solid #000;
+  border: 2px solid var(--background);
 }

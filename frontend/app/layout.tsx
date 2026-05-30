@@ -1,41 +1,58 @@
-import { ClerkProvider, SignInButton, SignUpButton, UserButton, Show } from "@clerk/nextjs"
+import { ClerkProvider, SignInButton, SignUpButton, UserButton } from "@clerk/nextjs"
+import { auth } from "@clerk/nextjs/server"
 import "./globals.css"
 import Link from "next/link"
 import { Metadata } from "next"
-import { Gamepad2, Globe, Cpu, MessageSquare } from "lucide-react"
+import { Gamepad2, Globe, Cpu, MessageSquare, History } from "lucide-react"
+import CustomCursor from "@/components/CustomCursor"
+import ThemeToggle from "@/components/ThemeToggle"
+
+import LoginButton from "@/components/LoginButton"
 
 export const metadata: Metadata = {
   title: "Syntax Showdown | Pixel AI Debate Arena",
   description: "Witness the ultimate pixel-art AI showdown with multi-agent debates orchestrated by LangGraph.",
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const { userId } = await auth()
+  
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className="bg-gray-950 text-gray-100 min-h-screen font-body antialiased overflow-x-hidden selection:bg-indigo-500/30 crt-overlay pixel-grid">
-          <header className="sticky top-0 z-50 flex items-center justify-between p-4 px-8 border-b-4 border-black bg-gray-900 shadow-[0_4px_0_0_rgba(0,0,0,1)]">
-            <Link href="/" className="font-silk text-2xl tracking-tighter flex items-center gap-3 hover:scale-105 transition-transform duration-75">
-              <div className="p-1.5 bg-indigo-600 border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,1)]">
-                <Gamepad2 className="w-6 h-6 text-white" />
+        <body className="bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen font-body antialiased overflow-x-hidden selection:bg-indigo-500/30 crt-overlay pixel-grid cursor-none">
+          <CustomCursor />
+          <header className="sticky top-0 z-50 w-full flex items-center justify-between p-4 px-4 md:px-8 border-b-4 border-black bg-white dark:bg-gray-900 shadow-[0_4px_0_0_rgba(0,0,0,1)] overflow-hidden">
+            <Link href="/" className="font-silk text-lg md:text-2xl tracking-tighter flex items-center gap-2 md:gap-3 shrink-0 hover:scale-105 transition-transform duration-75">
+              <div className="p-1 md:p-1.5 bg-indigo-600 border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,1)]">
+                <Gamepad2 className="w-5 h-5 md:w-6 md:h-6 text-white" />
               </div>
-              <span className="bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent truncate max-w-[120px] md:max-w-none">
                 Syntax Showdown
               </span>
             </Link>
             
-            <nav className="flex items-center gap-8 font-silk text-xs tracking-widest uppercase">
-              <Show when="signed-in">
-                <Link href="/dashboard" className="hover:text-indigo-400 transition-colors">Dashboard</Link>
-                <Link href="/arena" className="hover:text-indigo-400 transition-colors">Arena</Link>
-                <Link href="/history" className="hover:text-indigo-400 transition-colors">History</Link>
-                <div className="border-2 border-black p-0.5 bg-white shadow-[2px_2px_0_0_rgba(0,0,0,1)]">
-                  <UserButton appearance={{ elements: { avatarBox: "w-8 h-8 rounded-none" } }} />
+            <nav className="flex items-center gap-4 md:gap-8 font-silk text-[10px] md:text-xs tracking-widest uppercase ml-4">
+              <Link href="/" className="hover:text-indigo-400 transition-colors hidden sm:block">Home</Link>
+              
+              {userId ? (
+                <>
+                  <Link href="/dashboard" className="hover:text-indigo-400 transition-colors hidden md:block">Dashboard</Link>
+                  <Link href="/arena" className="hover:text-indigo-400 transition-colors">Arena</Link>
+                  <Link href="/history" className="hover:text-indigo-400 transition-colors hidden sm:block">History</Link>
+                  <div className="flex items-center gap-2 md:gap-4 ml-0 md:ml-2">
+                    <ThemeToggle />
+                    <div className="border-2 border-black p-0.5 bg-white shadow-[2px_2px_0_0_rgba(0,0,0,1)] flex items-center justify-center shrink-0">
+                      <UserButton appearance={{ elements: { avatarBox: "w-6 h-6 md:w-8 md:h-8 rounded-none", userButtonPopoverCard: "rounded-none border-4 border-black shadow-[8px_8px_0_0_#000]" } }} />
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex items-center gap-4 md:gap-6">
+                  <ThemeToggle />
+                  <LoginButton />
                 </div>
-              </Show>
-              <Show when="signed-out">
-                <SignInButton mode="modal"><button className="pixel-button scale-75">Login</button></SignInButton>
-              </Show>
+              )}
             </nav>
           </header>
 

@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     # HW-Friendly Models (Llama 3.2 1B is very snappy)
     PRO_MODEL: str = "llama3.2:1b"
     OPPONENT_MODEL: str = "llama3.2:1b"
-    JUDGE_MODEL: str = "mistral:latest"
+    JUDGE_MODEL: str = "deepseek-llm:latest"
 
     # ChromaDB Cloud
     CHROMA_HOST: str = "api.trychroma.com"

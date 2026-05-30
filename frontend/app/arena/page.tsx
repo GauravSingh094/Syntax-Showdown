@@ -40,9 +40,17 @@ export default function ArenaPage() {
         const { done, value } = await reader.read();
         if (done) break;
         const lines = decoder.decode(value).split('\n\n').filter(Boolean);
-        for (const line of lines) {
+          for (const line of lines) {
           if (line.startsWith('data: ')) {
             const data = JSON.parse(line.replace('data: ', ''));
+            if (data.type === 'sides') {
+               addMessage(data);
+               continue;
+            }
+            if (data.type === 'judge_start') {
+               addMessage({ type: 'system', content: "URGENT: ADJUDICATOR ENGAGED... CALCULATING VERDICT..." });
+               continue;
+            }
             if (data.type === 'done') {
                setDebating(false);
                break;
@@ -63,7 +71,7 @@ export default function ArenaPage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto p-4 md:p-8 h-[calc(100vh-100px)] flex flex-col">
+    <div className="max-w-5xl mx-auto p-4 md:p-8 h-[calc(100vh-100px)] flex flex-col overflow-hidden">
       {/* Control Panel */}
       <div className="mb-8 flex flex-col md:flex-row gap-4 bg-gray-900 border-4 border-black p-6 shadow-[8px_8px_0_0_rgba(0,0,0,1)] relative z-10">
         <div className="flex-1 relative">
@@ -96,7 +104,7 @@ export default function ArenaPage() {
         </div>
       </div>
 
-      <div ref={scrollRef} className="flex-1 flex flex-col gap-8 overflow-y-auto pb-12 relative z-0 pr-4 scrollbar-thin scrollbar-thumb-indigo-600 scrollbar-track-transparent">
+      <div ref={scrollRef} className="flex-1 flex flex-col gap-8 overflow-y-auto overscroll-contain touch-auto pb-12 relative z-20 pr-4 scrollbar-thin scrollbar-thumb-indigo-600 scrollbar-track-transparent">
         <AnimatePresence>
           {messages.length === 0 && !isDebating && (
              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-full flex items-center justify-center text-gray-700 flex-col gap-6">
@@ -111,15 +119,32 @@ export default function ArenaPage() {
               key={i} 
               initial={{ opacity: 0, x: m.type === 'pro' ? -20 : m.type === 'opponent' ? 20 : 0, y: 10 }} 
               animate={{ opacity: 1, x: 0, y: 0 }} 
-              className={`p-6 border-4 border-black relative ${
+              className={`p-6 border-4 border-black relative transition-all duration-300 ${
                 m.type === 'pro' ? 'mr-auto w-full md:w-[85%] bg-indigo-900/20 shadow-[6px_6px_0_0_#4f46e5]' : 
-                m.type === 'opponent' ? 'ml-auto w-full md:w-[85%] bg-cyan-900/20 shadow-[6px_6px_0_0_#0891b2] text-right' : 
+                m.type === 'opponent' ? 'ml-auto w-full md:w-[85%] bg-cyan-900/20 shadow-[6px_6px_0_0_#0891b2]' : 
                 m.type === 'judge' ? 'mx-auto w-full bg-gray-900 shadow-[8px_8px_0_0_#a855f7]' :
+                m.type === 'sides' ? 'mx-auto w-full max-w-2xl bg-indigo-600/10 border-indigo-500 shadow-[0_0_20px_rgba(79,70,229,0.2)]' :
                 m.type === 'error' ? 'mx-auto w-full max-w-xl bg-red-900/20 text-red-500 font-silk text-[10px] text-center' :
                 'mx-auto font-pixel text-[8px] text-gray-500 bg-black/40 px-6 py-2 border-2 border-black uppercase tracking-widest'
               }`}
             >
-              {m.type === 'pro' || m.type === 'opponent' ? (
+              {m.type === 'sides' ? (
+                <div className="flex flex-col items-center gap-6 py-4">
+                  <div className="flex items-center gap-3 font-silk text-[10px] text-indigo-400 tracking-[0.3em] uppercase">
+                    <Zap className="w-5 h-5 animate-pulse" /> Alignment Locked
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 w-full gap-8">
+                    <div className="text-center p-4 bg-black/40 border-2 border-indigo-500/30">
+                      <p className="font-silk text-[8px] text-indigo-400 mb-2 uppercase tracking-widest">In Favor / Pro</p>
+                      <p className="font-body text-white text-lg">{m.content.pro}</p>
+                    </div>
+                    <div className="text-center p-4 bg-black/40 border-2 border-cyan-500/30">
+                      <p className="font-silk text-[8px] text-cyan-400 mb-2 uppercase tracking-widest">In Opposition / Opponent</p>
+                      <p className="font-body text-white text-lg">{m.content.opponent}</p>
+                    </div>
+                  </div>
+                </div>
+              ) : m.type === 'pro' || m.type === 'opponent' ? (
                  <>
                    <div className={`flex items-center gap-3 mb-4 ${m.type === 'opponent' ? 'flex-row-reverse' : ''}`}>
                      <div className={`p-1.5 border-2 border-black ${m.type === 'pro' ? 'bg-indigo-600' : 'bg-cyan-600'}`}>
@@ -129,8 +154,12 @@ export default function ArenaPage() {
                        {m.type} {m.round && `| PHASE ${m.round}`}
                      </span>
                    </div>
-                   <div className="font-body text-gray-300 leading-relaxed text-sm md:text-base border-l-4 border-black/20 pl-4">
-                     {m.content}
+                   <div className="font-body text-gray-300 leading-relaxed text-sm md:text-base border-l-4 border-black/20 pl-4 space-y-3">
+                     {m.content.split('\n').map((line: string, li: number) => (
+                       <p key={li} className={line.trim().startsWith('-') || line.trim().startsWith('*') ? 'list-item list-inside' : ''}>
+                         {line.replace(/^[-*]\s*/, '')}
+                       </p>
+                     ))}
                    </div>
                  </>
               ) : m.type === 'judge' ? (
@@ -138,14 +167,34 @@ export default function ArenaPage() {
                     <div className="p-4 bg-purple-600 border-4 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] mb-6">
                       <Award className="w-12 h-12 text-white" />
                     </div>
-                    <h3 className="font-pixel text-xl mb-8 uppercase tracking-tighter">
+                    <h3 className="font-pixel text-xl mb-8 uppercase tracking-tighter text-center">
                       Verdict: <span className={m.content.winner === 'Pro' ? 'text-indigo-400' : 'text-cyan-400'}>{m.content.winner} ASCENDANT</span>
                     </h3>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 w-full gap-6 mb-8 font-silk text-[10px] uppercase">
+                       {/* Summaries */}
+                       <div className="bg-gray-950 border-4 border-black p-6 shadow-[3px_3px_0_0_#4f46e5]">
+                         <h4 className="text-indigo-400 mb-4 tracking-widest flex items-center gap-2">PRO SUMMARY</h4>
+                         <div className="text-gray-400 normal-case font-body text-xs space-y-2">
+                           {m.content?.pro_summary?.split('\n').map((s: string, si: number) => (
+                             <div key={si} className="flex gap-2"><span className="text-indigo-500">•</span> {s.replace(/^[-*]\s*/, '')}</div>
+                           )) || <p>No summary available.</p>}
+                         </div>
+                       </div>
+                       <div className="bg-gray-950 border-4 border-black p-6 shadow-[3px_3px_0_0_#0891b2]">
+                         <h4 className="text-cyan-400 mb-4 tracking-widest flex items-center gap-2">OPPONENT SUMMARY</h4>
+                         <div className="text-gray-400 normal-case font-body text-xs space-y-2">
+                            {m.content?.opponent_summary?.split('\n').map((s: string, si: number) => (
+                             <div key={si} className="flex gap-2"><span className="text-cyan-500">•</span> {s.replace(/^[-*]\s*/, '')}</div>
+                           )) || <p>No summary available.</p>}
+                         </div>
+                       </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 w-full gap-6 mb-8 font-silk text-[10px] uppercase">
                       <div className="bg-gray-950 border-4 border-black p-6 shadow-[4px_4px_0_0_#4f46e5]">
                         <h4 className="text-indigo-400 mb-4 tracking-widest">PRO METRICS</h4>
-                        {Object.entries(m.content.scores.Pro).map(([k, v]) => (
+                        {Object.entries(m.content?.scores?.Pro || {}).map(([k, v]) => (
                           <div key={k} className="flex justify-between border-b-2 border-white/5 py-2">
                             <span>{k}:</span> <span>{v as number}/10</span>
                           </div>
@@ -153,7 +202,7 @@ export default function ArenaPage() {
                       </div>
                       <div className="bg-gray-950 border-4 border-black p-6 shadow-[4px_4px_0_0_#0891b2]">
                         <h4 className="text-cyan-400 mb-4 tracking-widest">OPPONENT METRICS</h4>
-                        {Object.entries(m.content.scores.Opponent).map(([k, v]) => (
+                        {Object.entries(m.content?.scores?.Opponent || {}).map(([k, v]) => (
                           <div key={k} className="flex justify-between border-b-2 border-white/5 py-2">
                             <span>{k}:</span> <span>{v as number}/10</span>
                           </div>
@@ -163,7 +212,7 @@ export default function ArenaPage() {
                     
                     <div className="bg-gray-950 border-4 border-black p-6 w-full">
                        <h4 className="font-silk text-[10px] text-gray-500 mb-4 uppercase tracking-widest flex items-center gap-3">
-                         <Scale className="w-4 h-4" /> ADJUDICATION LOG
+                         <Scale className="w-4 h-4" /> ADJUDICATION LOG & KEY POINTS
                        </h4>
                        <p className="text-gray-400 text-sm font-body leading-relaxed">{m.content.reason}</p>
                     </div>
