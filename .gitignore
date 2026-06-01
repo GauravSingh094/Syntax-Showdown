@@ -59,3 +59,5 @@ yarn-error.log*
 backend/chroma_db/
 backend/data/
 **/__pycache__
+presentation.html
+
