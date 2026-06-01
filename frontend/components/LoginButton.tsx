@@ -6,7 +6,7 @@ export default function LoginButton() {
 
   return (
     <button 
-      onClick={() => openSignIn({ mode: 'modal' })}
+      onClick={() => openSignIn()}
       className="pixel-button scale-75 whitespace-nowrap cursor-pointer"
     >
       Login

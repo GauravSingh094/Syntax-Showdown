@@ -37,7 +37,7 @@ class GroqProvider(BaseLLMProvider):
             "temperature": 0.2 if role.lower() == "judge" else 0.7
         }
         
-        if format_json:
+        if format_json and "deepseek" not in model.lower():
             payload["response_format"] = {"type": "json_object"}
 
         start_time = time.perf_counter()

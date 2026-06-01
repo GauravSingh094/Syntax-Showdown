@@ -12,6 +12,21 @@ export default function ArenaPage() {
   const [rounds, setRounds] = useState(3);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  const renderSummary = (summary: any, bulletColor: string = "text-indigo-500") => {
+    if (!summary) return <p className="text-gray-500">No summary available.</p>;
+    const items = Array.isArray(summary)
+      ? summary
+      : typeof summary === "string"
+      ? summary.split("\n").filter(Boolean)
+      : [];
+    return items.map((s: string, si: number) => (
+      <div key={si} className="flex gap-2">
+        <span className={bulletColor}>•</span> 
+        <span>{s.replace(/^[-*•]\s*/, "")}</span>
+      </div>
+    ));
+  };
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -172,23 +187,19 @@ export default function ArenaPage() {
                     </h3>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 w-full gap-6 mb-8 font-silk text-[10px] uppercase">
-                       {/* Summaries */}
-                       <div className="bg-gray-950 border-4 border-black p-6 shadow-[3px_3px_0_0_#4f46e5]">
-                         <h4 className="text-indigo-400 mb-4 tracking-widest flex items-center gap-2">PRO SUMMARY</h4>
-                         <div className="text-gray-400 normal-case font-body text-xs space-y-2">
-                           {m.content?.pro_summary?.split('\n').map((s: string, si: number) => (
-                             <div key={si} className="flex gap-2"><span className="text-indigo-500">•</span> {s.replace(/^[-*]\s*/, '')}</div>
-                           )) || <p>No summary available.</p>}
-                         </div>
-                       </div>
-                       <div className="bg-gray-950 border-4 border-black p-6 shadow-[3px_3px_0_0_#0891b2]">
-                         <h4 className="text-cyan-400 mb-4 tracking-widest flex items-center gap-2">OPPONENT SUMMARY</h4>
-                         <div className="text-gray-400 normal-case font-body text-xs space-y-2">
-                            {m.content?.opponent_summary?.split('\n').map((s: string, si: number) => (
-                             <div key={si} className="flex gap-2"><span className="text-cyan-500">•</span> {s.replace(/^[-*]\s*/, '')}</div>
-                           )) || <p>No summary available.</p>}
-                         </div>
-                       </div>
+                        {/* Summaries */}
+                        <div className="bg-gray-950 border-4 border-black p-6 shadow-[3px_3px_0_0_#4f46e5]">
+                          <h4 className="text-indigo-400 mb-4 tracking-widest flex items-center gap-2">PRO SUMMARY</h4>
+                          <div className="text-gray-400 normal-case font-body text-xs space-y-2">
+                            {renderSummary(m.content?.pro_summary, "text-indigo-500")}
+                          </div>
+                        </div>
+                        <div className="bg-gray-950 border-4 border-black p-6 shadow-[3px_3px_0_0_#0891b2]">
+                          <h4 className="text-cyan-400 mb-4 tracking-widest flex items-center gap-2">OPPONENT SUMMARY</h4>
+                          <div className="text-gray-400 normal-case font-body text-xs space-y-2">
+                            {renderSummary(m.content?.opponent_summary, "text-cyan-500")}
+                          </div>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 w-full gap-6 mb-8 font-silk text-[10px] uppercase">

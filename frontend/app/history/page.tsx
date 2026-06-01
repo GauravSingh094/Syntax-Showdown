@@ -11,6 +11,21 @@ export default function HistoryPage() {
   const [selectedDebate, setSelectedDebate] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const renderSummary = (summary: any, bulletColor: string = "text-indigo-500") => {
+    if (!summary) return <p className="text-gray-500">No summary available.</p>;
+    const items = Array.isArray(summary)
+      ? summary
+      : typeof summary === "string"
+      ? summary.split("\n").filter(Boolean)
+      : [];
+    return items.map((s: string, si: number) => (
+      <div key={si} className="flex gap-2">
+        <span className={bulletColor}>•</span> 
+        <span>{s.replace(/^[-*•]\s*/, "")}</span>
+      </div>
+    ));
+  };
+
 
   useEffect(() => {
     async function fetchHistory() {
@@ -159,25 +174,21 @@ export default function HistoryPage() {
                   </div>
                 ))}
 
-                {/* Summaries Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   <div className="bg-gray-900 border-4 border-black p-6">
-                     <h4 className="font-silk text-[10px] text-indigo-400 mb-4 uppercase">PRO SUMMARY</h4>
-                     <div className="text-gray-400 text-xs font-body space-y-2">
-                       {selectedDebate.verdict?.pro_summary?.split('\n').map((s: string, si: number) => (
-                         <div key={si} className="flex gap-2"><span>•</span> {s.replace(/^[-*]\s*/, '')}</div>
-                       ))}
-                     </div>
-                   </div>
-                   <div className="bg-gray-900 border-4 border-black p-6">
-                     <h4 className="font-silk text-[10px] text-cyan-400 mb-4 uppercase">OPPONENT SUMMARY</h4>
-                     <div className="text-gray-400 text-xs font-body space-y-2">
-                       {selectedDebate.verdict?.opponent_summary?.split('\n').map((s: string, si: number) => (
-                         <div key={si} className="flex gap-2"><span>•</span> {s.replace(/^[-*]\s*/, '')}</div>
-                       ))}
-                     </div>
-                   </div>
-                </div>
+                 {/* Summaries Section */}
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-gray-900 border-4 border-black p-6">
+                      <h4 className="font-silk text-[10px] text-indigo-400 mb-4 uppercase">PRO SUMMARY</h4>
+                      <div className="text-gray-400 text-xs font-body space-y-2">
+                        {renderSummary(selectedDebate.verdict?.pro_summary, "text-indigo-400")}
+                      </div>
+                    </div>
+                    <div className="bg-gray-900 border-4 border-black p-6">
+                      <h4 className="font-silk text-[10px] text-cyan-400 mb-4 uppercase">OPPONENT SUMMARY</h4>
+                      <div className="text-gray-400 text-xs font-body space-y-2">
+                        {renderSummary(selectedDebate.verdict?.opponent_summary, "text-cyan-400")}
+                      </div>
+                    </div>
+                 </div>
 
                 {/* Final Verdict */}
                 <div className="bg-gray-900 border-8 border-black p-10 pt-16 relative">

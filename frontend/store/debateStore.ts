@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 export type DebateMessage = {
-  type: 'pro' | 'opponent' | 'judge' | 'system' | 'error';
+  type: 'pro' | 'opponent' | 'judge' | 'system' | 'error' | 'sides';
   round?: number;
   content: any; // text for pro/opponent/system, object for judge
 };

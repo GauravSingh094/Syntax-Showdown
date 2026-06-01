@@ -5,9 +5,11 @@ from app.llm import generate
 FALLBACK_VERDICT = {
     "winner": "Undecided",
     "scores": {
-        "Pro": {"logic": 0, "evidence": 0, "clarity": 0},
-        "Opponent": {"logic": 0, "evidence": 0, "clarity": 0}
+        "Pro": {"logic": 0, "evidence": 0, "rebuttal": 0},
+        "Opponent": {"logic": 0, "evidence": 0, "rebuttal": 0}
     },
+    "pro_summary": "No summary available.",
+    "opponent_summary": "No summary available.",
     "reason": "Judge evaluation failed to reach a definitive conclusion."
 }
 
@@ -53,7 +55,31 @@ class JudgeAgent:
         for attempt in range(2):
             try:
                 raw = await generate(prompt, role="Judge", format_json=True)
-                data = json.loads(raw)
+                
+                # Robust extraction of JSON from raw response
+                cleaned = raw.strip()
+                # 1. Remove deepseek thinking blocks if present
+                import re
+                cleaned = re.sub(r"<think>.*?</think>", "", cleaned, flags=re.DOTALL).strip()
+                
+                # 2. Extract code blocks if markdown is used
+                code_block_match = re.search(r"```json\s*(.*?)\s*```", cleaned, re.DOTALL)
+                if code_block_match:
+                    json_str = code_block_match.group(1).strip()
+                else:
+                    code_block_match_generic = re.search(r"```\s*(.*?)\s*```", cleaned, re.DOTALL)
+                    if code_block_match_generic:
+                        json_str = code_block_match_generic.group(1).strip()
+                    else:
+                        # 3. Find the first '{' and last '}'
+                        first_brace = cleaned.find('{')
+                        last_brace = cleaned.rfind('}')
+                        if first_brace != -1 and last_brace != -1 and last_brace > first_brace:
+                            json_str = cleaned[first_brace:last_brace+1]
+                        else:
+                            json_str = cleaned
+
+                data = json.loads(json_str)
                 
                 # Normalize keys if model returned lowercase
                 # Patch: Summary Correction Layer (Aggressive)
@@ -83,7 +109,10 @@ class JudgeAgent:
                         pro_reb = data["scores"].get("Pro", {}).get("rebuttal", 0)
                         opp_reb = data["scores"].get("Opponent", {}).get("rebuttal", 0)
                         data["winner"] = "Pro" if pro_reb >= opp_reb else "Opponent"
-                        data["reason"] += " (Winner decided by tie-breaker: Rebuttal Quality)."
+                        if "reason" not in data or not isinstance(data["reason"], str):
+                            data["reason"] = "Winner decided by tie-breaker: Rebuttal Quality."
+                        else:
+                            data["reason"] += " (Winner decided by tie-breaker: Rebuttal Quality)."
                 
                 return data
             except (json.JSONDecodeError, Exception) as e:
