@@ -1,9 +1,8 @@
 from app.agents.base_agent import BaseAgent
-from app.config.settings import settings
 
 class ProAgent(BaseAgent):
     def __init__(self):
-        super().__init__(model=settings.PRO_MODEL, role="Pro")
+        super().__init__(model="pro", role="Pro")
 
     def _build_prompt(self, topic: str, history: str, mode: str = "classic", *args, **kwargs) -> str:
         return f"""You are arguing IN FAVOR of: "{topic}"

@@ -1,6 +1,6 @@
+import asyncio
 from fastapi import APIRouter
-import httpx
-from app.config.settings import settings
+from app.llm.provider_manager import llm_manager
 from app.memory.chromadb_client import collection
 
 router = APIRouter()
@@ -8,16 +8,33 @@ router = APIRouter()
 @router.get("/health")
 async def health():
     status = {}
-    try:
-        async with httpx.AsyncClient(timeout=3.0) as client:
-            r = await client.get(f"{settings.OLLAMA_URL}/api/tags")
-            status["ollama"] = "ok" if r.status_code == 200 else "degraded"
-    except:
-        status["ollama"] = "unreachable"
+    
+    # 1. Probe all configured LLM providers in parallel
+    provider_keys = list(llm_manager.providers.keys())
+    tasks = [llm_manager.providers[k].check_health() for k in provider_keys]
+    
+    health_results = await asyncio.gather(*tasks, return_exceptions=True)
+    
+    llm_status = {}
+    for key, result in zip(provider_keys, health_results):
+        if isinstance(result, Exception):
+            llm_status[key] = {
+                "status": "unreachable",
+                "error": str(result),
+                "latency_ms": 0,
+                "model": llm_manager.providers[key].debate_model
+            }
+        else:
+            llm_status[key] = result
+            
+    status["providers"] = llm_status
+    
+    # 2. Probe ChromaDB Cloud status
     try:
         collection.count()
         status["chromadb"] = "ok"
-    except:
-        status["chromadb"] = "unreachable"
+    except Exception as e:
+        status["chromadb"] = f"unreachable: {str(e)}"
+        
     status["api"] = "ok"
     return status

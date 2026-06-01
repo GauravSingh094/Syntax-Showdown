@@ -1,4 +1,5 @@
 import json, uuid, asyncio
+from datetime import datetime
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
 from app.orchestrator.state import DebateState
@@ -9,6 +10,7 @@ from app.memory.chromadb_client import store_debate
 from app.core.rate_limiter import check_rate_limit
 from pydantic import BaseModel
 from app.agents.side_agent import SideAgent
+from app.llm.provider_manager import debate_calls_context
 
 router = APIRouter()
 side_agent = SideAgent()
@@ -24,6 +26,7 @@ async def start_debate(req: DebateRequest, user=Depends(get_current_user)):
     check_rate_limit(user.id)
 
     async def event_stream():
+        debate_calls_context.set([])
         request_id = str(uuid.uuid4())
         state = DebateState(
             request_id=request_id, user_id=user.id, topic=topic,
@@ -50,8 +53,26 @@ async def start_debate(req: DebateRequest, user=Depends(get_current_user)):
             state = await judge_node(state)
             yield f'data: {json.dumps({"type":"judge","content":state["verdict"]})}\n\n'
 
-            await store_debate(user_id=user.id, topic=topic,
-                               rounds_data=state["rounds_data"], verdict=state["verdict"])
+            # Extract metrics recorded in current async context (Requirement 9)
+            calls = debate_calls_context.get()
+            success_calls = [c for c in calls if c["status"] == "Success"]
+            providers_used = ", ".join(list(dict.fromkeys(c["provider"] for c in success_calls)))
+            models_used = ", ".join(list(dict.fromkeys(c["model"] for c in success_calls)))
+            total_cost = sum(c["cost"] for c in calls)
+            total_latency = sum(c["latency_ms"] for c in calls)
+            timestamp = datetime.utcnow().isoformat()
+
+            await store_debate(
+                user_id=user.id,
+                topic=topic,
+                rounds_data=state["rounds_data"],
+                verdict=state["verdict"],
+                provider_used=providers_used or "unknown",
+                model_used=models_used or "unknown",
+                timestamp=timestamp,
+                cost=total_cost,
+                latency_ms=total_latency
+            )
 
             yield f'data: {json.dumps({"type":"done"})}\n\n'
         except Exception as e:

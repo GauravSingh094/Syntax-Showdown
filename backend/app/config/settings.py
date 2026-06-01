@@ -1,13 +1,15 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    # Ollama
-    OLLAMA_URL: str = "http://localhost:11434"
+    # LLM Router configuration
+    PRIMARY_PROVIDER: str = "groq"
+    ENABLE_FAILOVER: bool = True
 
-    # HW-Friendly Models (Llama 3.2 1B is very snappy)
-    PRO_MODEL: str = "llama3.2:1b"
-    OPPONENT_MODEL: str = "llama3.2:1b"
-    JUDGE_MODEL: str = "deepseek-llm:latest"
+    # Cloud LLM API Keys
+    GROQ_API_KEY: str = ""
+    OPENROUTER_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""
+    OPENAI_API_KEY: str = ""
 
     # ChromaDB Cloud
     CHROMA_HOST: str = "api.trychroma.com"

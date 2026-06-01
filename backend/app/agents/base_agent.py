@@ -1,5 +1,5 @@
 
-from app.llm.ollama_client import generate
+from app.llm import generate
 
 class BaseAgent:
     def __init__(self, model: str, role: str):
@@ -24,7 +24,7 @@ class BaseAgent:
         )
 
         for attempt in range(2):
-            response = await generate(prompt + stance_instr, self.model)
+            response = await generate(prompt + stance_instr, role=self.role)
             
             # REFUSAL & CONCESSION DETECTION
             refusal_terms = ["cannot fulfill", "unable to", "as an ai", "policy", "guidelines", "sensitive", "harmful", "illegal"]

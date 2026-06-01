@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syntax Showdown Presentation</title>
+    <!-- Premium Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #03001e;
+            --card-bg: rgba(15, 12, 30, 0.6);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --accent-primary: #7f00ff;
+            --accent-secondary: #e100ff;
+            --accent-tertiary: #00f2fe;
+            --text-primary: #ffffff;
+            --text-secondary: #b3b3cc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at 50% 50%, #16003b 0%, #03001e 100%);
+            color: var(--text-primary);
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        header {
+            padding: 2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-tertiary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo span {
+            font-size: 1.2rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            -webkit-text-fill-color: initial;
+        }
+
+        .slide-container {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 4rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide {
+            position: absolute;
+            width: calc(100% - 8rem);
+            height: 80%;
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+            pointer-events: none;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            align-content: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: all;
+            z-index: 2;
+        }
+
+        /* Slide 1 Styles */
+        .slide-1-content {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .title-area h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 4.5rem;
+            font-weight: 800;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 30%, #a5a5ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .title-area p.subtitle {
+            font-size: 1.4rem;
+            color: var(--accent-tertiary);
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .team-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.6rem 1.2rem;
+            border-radius: 50px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2.5rem;
+        }
+
+        .team-badge .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .overview-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.5rem;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .overview-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
+        }
+
+        .overview-card h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .overview-card p {
+            color: var(--text-secondary);
+            font-size: 1.15rem;
+            line-height: 1.7;
+        }
+
+        /* Slide 2 Styles */
+        .slide-2-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            height: 100%;
+            align-items: center;
+        }
+
+        .left-col {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .mini-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            padding: 1.2rem;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .mini-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .mini-card h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent-tertiary);
+        }
+
+        .mini-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .tech-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .tag {
+            background: rgba(127, 0, 255, 0.15);
+            border: 1px solid rgba(127, 0, 255, 0.3);
+            color: #d1b3ff;
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .diagram-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2rem;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            backdrop-filter: blur(20px);
+        }
+
+        .diagram-container h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff, var(--text-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* SVG DFD Diagram styling */
+        .dfd-svg {
+            width: 100%;
+            height: auto;
+            max-height: 350px;
+        }
+
+        /* Slide 3 Styles */
+        .slide-3-content {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .mockup-container {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            background: #000;
+        }
+
+        .mockup-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+            opacity: 0.9;
+        }
+
+        .mockup-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .mockup-overlay p {
+            font-size: 0.95rem;
+            color: var(--accent-tertiary);
+            font-weight: 600;
+        }
+
+        .learning-cards {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .learn-card {
+            background: rgba(255, 255, 255, 0.02);
+            border-left: 4px solid var(--accent-primary);
+            border-top: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.2rem 1.5rem;
+            border-radius: 0 16px 16px 0;
+        }
+
+        .learn-card.secondary {
+            border-left-color: var(--accent-secondary);
+        }
+
+        .learn-card.tertiary {
+            border-left-color: var(--accent-tertiary);
+        }
+
+        .learn-card h4 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.2rem;
+            margin-bottom: 0.4rem;
+            color: #ffffff;
+        }
+
+        .learn-card p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Footer Controls */
+        footer {
+            padding: 2rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: #ffffff;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px rgba(127, 0, 255, 0.4);
+            transform: scale(1.1);
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .indicators {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: var(--accent-tertiary);
+            transform: scale(1.3);
+            box-shadow: 0 0 10px var(--accent-tertiary);
+        }
+
+        .keyboard-hint {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">SYNTAX SHOWDOWN <span>v1.0</span></div>
+        <div class="keyboard-hint">Use Left/Right Arrows or Space to navigate</div>
+    </header>
+
+    <div class="slide-container">
+        <!-- Slide 1: Project Overview -->
+        <section class="slide active" id="slide-1">
+            <div class="slide-1-content">
+                <div class="title-area">
+                    <div class="team-badge">
+                        <div class="avatar">GS</div>
+                        <span>Created by <strong>Gaurav Singh</strong></span>
+                    </div>
+                    <h1>Multi-Agent AI<br>Debate Arena</h1>
+                    <p class="subtitle">Structured competitive debate orchestrated by autonomous LLMs</p>
+                </div>
+                <div class="overview-card">
+                    <h3>🎯 The Objective</h3>
+                    <p>
+                        Standard single-agent Chat LLMs are prone to confirmation biases, logical shortcuts, and unchecked hallucinations. 
+                        <strong>Syntax Showdown</strong> establishes a high-performance evaluation environment. By pitting advanced LLMs against each other as Pro and Opponent nodes under the mediation of a surgical Judge agent, the system forces reasoning transparency, unmasks logic edge cases, and produces a highly objective argumentation score metrics.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: Solution & Implementation -->
+        <section class="slide" id="slide-2">
+            <div class="slide-2-content">
+                <div class="left-col">
+                    <div class="overview-card" style="padding: 1.5rem 2rem;">
+                        <h3 style="font-size: 1.5rem; margin-bottom: 0.8rem;">💡 The Solution</h3>
+                        <p style="font-size: 1rem; line-height: 1.5;">
+                            An orchestration graph built with LangGraph managing State Nodes for Pro and Opponent argumentation, coupled with a server-sent events (SSE) streaming gateway for real-time dashboard visualization.
+                        </p>
+                    </div>
+                    <div class="feature-grid">
+                        <div class="mini-card">
+                            <h4>Stance Guard</h4>
+                            <p>Active loops intercepting AI safety refusals, forcing direct role commitment.</p>
+                        </div>
+                        <div class="mini-card">
+                            <h4>Conflict Checker</h4>
+                            <p>Round 1 semantic verification aborts low-clash, agreeable debates early.</p>
+                        </div>
+                        <div class="mini-card">
+                            <h4>Dual-Model Logic</h4>
+                            <p>Llama 3.2 1B powers fast, snappy turns. DeepSeek judges with elite logical rigor.</p>
+                        </div>
+                        <div class="mini-card">
+                            <h4>Clash Point Math</h4>
+                            <p>Mathematical validator ensuring written verdicts align precisely with scores.</p>
+                        </div>
+                    </div>
+                    <div class="tech-tags">
+                        <span class="tag">FastAPI</span>
+                        <span class="tag">LangGraph</span>
+                        <span class="tag">Next.js 15</span>
+                        <span class="tag">ChromaDB Cloud</span>
+                        <span class="tag">Ollama</span>
+                        <span class="tag">Clerk Auth</span>
+                    </div>
+                </div>
+                <div class="diagram-container">
+                    <h3>📊 Data Flow Diagram (DFD)</h3>
+                    <!-- Beautiful SVG rendering the DFD -->
+                    <svg class="dfd-svg" viewBox="0 0 500 350" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Definitions for arrows -->
+                        <defs>
+                            <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                                <path d="M 0 0 L 10 5 L 0 10 z" fill="#00f2fe"/>
+                            </marker>
+                        </defs>
+                        <!-- Grid elements -->
+                        <!-- UI Browser Box -->
+                        <rect x="20" y="20" width="130" height="40" rx="8" fill="rgba(255, 255, 255, 0.05)" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1.5"/>
+                        <text x="85" y="45" fill="#ffffff" font-family="'Outfit'" font-size="12" font-weight="600" text-anchor="middle">Next.js UI Dashboard</text>
+
+                        <!-- API Gateway Box -->
+                        <rect x="200" y="20" width="130" height="40" rx="8" fill="rgba(127, 0, 255, 0.15)" stroke="#7f00ff" stroke-width="1.5"/>
+                        <text x="265" y="45" fill="#ffffff" font-family="'Outfit'" font-size="12" font-weight="600" text-anchor="middle">FastAPI Middleware</text>
+
+                        <!-- LangGraph Core Box -->
+                        <rect x="375" y="20" width="105" height="150" rx="12" fill="rgba(225, 0, 255, 0.1)" stroke="#e100ff" stroke-width="1.5"/>
+                        <text x="427" y="40" fill="#ffffff" font-family="'Outfit'" font-size="12" font-weight="600" text-anchor="middle">LangGraph</text>
+                        <text x="427" y="60" fill="rgba(255, 255, 255, 0.5)" font-family="'Plus Jakarta Sans'" font-size="9" text-anchor="middle">Pro Agent Node</text>
+                        <text x="427" y="80" fill="rgba(255, 255, 255, 0.5)" font-family="'Plus Jakarta Sans'" font-size="9" text-anchor="middle">Opponent Node</text>
+                        <text x="427" y="100" fill="rgba(255, 255, 255, 0.5)" font-family="'Plus Jakarta Sans'" font-size="9" text-anchor="middle">Conflict Check</text>
+                        <text x="427" y="120" fill="rgba(255, 255, 255, 0.5)" font-family="'Plus Jakarta Sans'" font-size="9" text-anchor="middle">Judge Node</text>
+
+                        <!-- Local Ollama Model Box -->
+                        <rect x="200" y="180" width="130" height="60" rx="8" fill="rgba(0, 242, 254, 0.1)" stroke="#00f2fe" stroke-width="1.5"/>
+                        <text x="265" y="205" fill="#ffffff" font-family="'Outfit'" font-size="12" font-weight="600" text-anchor="middle">Local Ollama LLM</text>
+                        <text x="265" y="222" fill="var(--accent-tertiary)" font-family="'Plus Jakarta Sans'" font-size="9" text-anchor="middle">Llama 3.2 & DeepSeek</text>
+
+                        <!-- ChromaDB Storage -->
+                        <rect x="375" y="270" width="105" height="50" rx="8" fill="rgba(255, 115, 0, 0.15)" stroke="#ff7300" stroke-width="1.5"/>
+                        <text x="427" y="295" fill="#ffffff" font-family="'Outfit'" font-size="11" font-weight="600" text-anchor="middle">ChromaDB Cloud</text>
+                        <text x="427" y="310" fill="rgba(255,255,255,0.4)" font-family="'Plus Jakarta Sans'" font-size="8" text-anchor="middle">Debate History</text>
+
+                        <!-- Connections -->
+                        <path d="M 150 40 L 195 40" stroke="#00f2fe" stroke-width="1.5" marker-end="url(#arrow)"/>
+                        <path d="M 330 40 L 370 40" stroke="#00f2fe" stroke-width="1.5" marker-end="url(#arrow)"/>
+                        <path d="M 375 95 L 335 185" stroke="#00f2fe" stroke-width="1.2" stroke-dasharray="3" marker-end="url(#arrow)"/>
+                        <path d="M 265 180 L 265 85 L 370 85" stroke="#00f2fe" stroke-width="1.2" stroke-dasharray="3" marker-end="url(#arrow)"/>
+                        <path d="M 427 170 L 427 265" stroke="#00f2fe" stroke-width="1.5" marker-end="url(#arrow)"/>
+                        <path d="M 375 295 L 85 295 L 85 65" stroke="rgba(255,255,255,0.2)" stroke-width="1.2" stroke-dasharray="4" marker-end="url(#arrow)"/>
+                        
+                        <text x="172" y="32" fill="var(--text-secondary)" font-size="8" text-anchor="middle">Auth JWT</text>
+                        <text x="352" y="32" fill="var(--text-secondary)" font-size="8" text-anchor="middle">State Init</text>
+                        <text x="435" y="220" fill="var(--text-secondary)" font-size="8" text-anchor="middle">Store History</text>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Results & Learning -->
+        <section class="slide" id="slide-3">
+            <div class="slide-3-content">
+                <div class="mockup-container">
+                    <img src="dashboard_mockup.png" alt="Syntax Showdown Interactive Dashboard UI">
+                    <div class="mockup-overlay">
+                        <p>Syntax Showdown Live Dashboard Interface</p>
+                    </div>
+                </div>
+                <div class="learning-cards">
+                    <div class="learn-card">
+                        <h4>⚠️ Engineering Challenges</h4>
+                        <p>
+                            LLMs natively resist aggressive debating due to safety alignment, defaulting to friendly concessions. Additionally, local multi-turn text generation initially suffered from high response latency.
+                        </p>
+                    </div>
+                    <div class="learn-card secondary">
+                        <h4>💡 Core Learnings</h4>
+                        <p>
+                            We overcame limitations by implementing double-pass Stance Guardian prompts (forcing roleplay focus) and adopting Llama 3.2 1B to maximize generation speeds locally.
+                        </p>
+                    </div>
+                    <div class="learn-card tertiary">
+                        <h4>🚀 Future Scope</h4>
+                        <p>
+                            Adding support for commercial models (Gemini Flash), extending vector-search over historic debates to enable contextual memory, and launching customizable agent personas.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <div class="controls">
+            <button class="btn" id="prev-btn" onclick="navigate(-1)">&#8592;</button>
+            <div class="indicators">
+                <div class="dot active" onclick="goToSlide(0)"></div>
+                <div class="dot" onclick="goToSlide(1)"></div>
+                <div class="dot" onclick="goToSlide(2)"></div>
+            </div>
+            <button class="btn" id="next-btn" onclick="navigate(1)">&#8594;</button>
+        </div>
+        <div>Syntax Showdown &bull; Gaurav Singh</div>
+    </footer>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
+
+        function updateSlides() {
+            slides.forEach((slide, idx) => {
+                if (idx === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+
+            dots.forEach((dot, idx) => {
+                if (idx === currentSlide) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        function navigate(direction) {
+            currentSlide = (currentSlide + direction + slides.length) % slides.length;
+            updateSlides();
+        }
+
+        function goToSlide(idx) {
+            currentSlide = idx;
+            updateSlides();
+        }
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                navigate(1);
+            } else if (e.key === 'ArrowLeft') {
+                navigate(-1);
+            }
+        });
+    </script>
+</body>
+</html>

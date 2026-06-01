@@ -1,9 +1,8 @@
 from app.agents.base_agent import BaseAgent
-from app.config.settings import settings
 
 class OpponentAgent(BaseAgent):
     def __init__(self):
-        super().__init__(model=settings.OPPONENT_MODEL, role="Opponent")
+        super().__init__(model="opponent", role="Opponent")
 
     def _build_prompt(self, topic: str, history: str, mode: str = "classic", *args, **kwargs) -> str:
         return f"""You are arguing AGAINST: "{topic}"

@@ -1,7 +1,6 @@
 import json
 
-from app.config.settings import settings
-from app.llm.ollama_client import generate
+from app.llm import generate
 
 FALLBACK_VERDICT = {
     "winner": "Undecided",
@@ -14,7 +13,7 @@ FALLBACK_VERDICT = {
 
 class JudgeAgent:
     def __init__(self):
-        self.model = settings.JUDGE_MODEL
+        pass
 
     async def evaluate(self, topic: str, rounds_data: list[dict]) -> dict:
         debate_text = "\n".join(
@@ -53,7 +52,7 @@ class JudgeAgent:
 
         for attempt in range(2):
             try:
-                raw = await generate(prompt, self.model, format="json")
+                raw = await generate(prompt, role="Judge", format_json=True)
                 data = json.loads(raw)
                 
                 # Normalize keys if model returned lowercase
