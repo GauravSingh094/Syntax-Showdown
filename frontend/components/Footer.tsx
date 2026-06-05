@@ -220,12 +220,6 @@ export default function Footer() {
           <div className="flex gap-4 pt-2">
             {[
               {
-                title: "Discord",
-                icon: <MessageSquare className="w-4 h-4" />,
-                color: "text-indigo-400 hover:bg-indigo-600 hover:border-indigo-400 hover:text-white",
-                url: "#"
-              },
-              {
                 title: "GitHub",
                 icon: (
                   <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -233,7 +227,7 @@ export default function Footer() {
                   </svg>
                 ),
                 color: "text-emerald-400 hover:bg-emerald-600 hover:border-emerald-400 hover:text-white",
-                url: "#"
+                url: "https://github.com/GauravSingh094"
               },
               {
                 title: "LinkedIn",
@@ -243,19 +237,21 @@ export default function Footer() {
                   </svg>
                 ),
                 color: "text-sky-400 hover:bg-sky-600 hover:border-sky-400 hover:text-white",
-                url: "#"
+                url: "https://www.linkedin.com/in/gaurav-singh-276944292"
               },
               {
-                title: "Website",
+                title: "Portfolio",
                 icon: <Globe className="w-4 h-4" />,
                 color: "text-amber-400 hover:bg-amber-600 hover:border-amber-400 hover:text-white",
-                url: "#"
+                url: "https://connectwithgaurav.vercel.app/"
               }
             ].map((social, idx) => (
               <a
                 key={idx}
                 href={social.url}
                 title={social.title}
+                target="_blank"
+                rel="noopener noreferrer"
                 onMouseEnter={() => playClick()}
                 onClick={() => playClick()}
                 className={`p-3.5 bg-gray-900 border-4 border-black transition-all shadow-[3px_3px_0_0_#000] hover:shadow-[5px_5px_0_0_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_0_#000] cursor-pointer ${social.color}`}
