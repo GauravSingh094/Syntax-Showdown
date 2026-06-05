@@ -23,7 +23,7 @@ export default function Footer() {
   const [isPinging, setIsPinging] = useState(false);
   const [pingProgress, setPingProgress] = useState(0);
   const [latency, setLatency] = useState(8);
-  const logEndRef = useRef<HTMLDivElement>(null);
+  const logContainerRef = useRef<HTMLDivElement>(null);
 
   // Keep auto-typing logs
   useEffect(() => {
@@ -42,9 +42,11 @@ export default function Footer() {
     return () => clearInterval(timer);
   }, [logIndex, isPinging]);
 
-  // Scroll terminal logs to bottom
+  // Scroll terminal logs to bottom inside the log container to avoid main viewport shifts
   useEffect(() => {
-    logEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (logContainerRef.current) {
+      logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
+    }
   }, [logs, pingProgress]);
 
   const handlePing = () => {
@@ -149,7 +151,10 @@ export default function Footer() {
             {/* CRT Screen Scanline Layer */}
             <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] opacity-20" />
             
-            <div className="overflow-y-auto space-y-1.5 pr-1 font-mono text-[8px] text-emerald-400 leading-normal scrollbar-none h-[110px] select-text">
+            <div 
+              ref={logContainerRef} 
+              className="overflow-y-auto space-y-1.5 pr-1 font-mono text-[8px] text-emerald-400 leading-normal scrollbar-none h-[110px] select-text scroll-smooth"
+            >
               {logs.map((log, idx) => (
                 <div key={idx} className="flex gap-1 items-start">
                   <span className="text-indigo-500 shrink-0">&gt;</span>
@@ -162,7 +167,6 @@ export default function Footer() {
                   PROGRESS: [{("█".repeat(Math.floor(pingProgress / 10)) + "░".repeat(10 - Math.floor(pingProgress / 10)))}] {pingProgress}%
                 </div>
               )}
-              <div ref={logEndRef} />
             </div>
 
             <div className="border-t border-emerald-950/60 pt-2 mt-2 flex items-center justify-between">
