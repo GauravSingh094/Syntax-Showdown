@@ -4,11 +4,13 @@ import { motion, AnimatePresence, useInView } from "framer-motion";
 import Link from "next/link";
 import { Zap, Brain, Terminal, Cpu, Sparkles, Shield, Scale, ChevronRight, Play, BarChart3, GitBranch, ChevronDown, HelpCircle, Activity, Database, Server } from "lucide-react";
 import Lenis from "lenis";
-import PixelArena from "@/components/PixelArena";
+import dynamic from "next/dynamic";
 import AnimatedButton from "@/components/AnimatedButton";
 import PixelParticlesBg from "@/components/PixelParticlesBg";
 import DebatePreviewConsole from "@/components/DebatePreviewConsole";
 import { useSoundStore } from "@/store/soundStore";
+
+const PixelArena = dynamic(() => import("@/components/PixelArena"), { ssr: false });
 
 /* ─── Animated Counter ──────────────────────────────────────────────────── */
 function AnimatedNumber({ value, suffix = "" }: { value: number; suffix?: string }) {
@@ -253,28 +255,42 @@ function ArchitectureMap() {
    HOME PAGE
    ══════════════════════════════════════════════════════════════════════════ */
 export default function Home() {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(true); // Default to true on SSR to avoid loading 3D bundle
   const { playClick } = useSoundStore();
 
   useEffect(() => {
-    // Lenis smooth scroll initialization (Task 2)
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: "vertical",
-      gestureOrientation: "vertical",
-      smoothWheel: true,
-    });
-    
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
+    // Screen size detection for conditional mounting
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    // Initialize Lenis smooth scroll only on desktop
+    let lenis: Lenis | null = null;
+    let rafId: number;
+
+    if (window.innerWidth >= 768) {
+      lenis = new Lenis({
+        duration: 1.2,
+        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        orientation: "vertical",
+        gestureOrientation: "vertical",
+        smoothWheel: true,
+      });
+
+      const raf = (time: number) => {
+        lenis?.raf(time);
+        rafId = requestAnimationFrame(raf);
+      };
+      rafId = requestAnimationFrame(raf);
     }
-    requestAnimationFrame(raf);
-    setTimeout(() => setIsLoading(false), 1000);
-    
+
     return () => {
-      lenis.destroy();
+      window.removeEventListener("resize", checkMobile);
+      if (lenis) {
+        lenis.destroy();
+        cancelAnimationFrame(rafId);
+      }
     };
   }, []);
 
@@ -332,7 +348,7 @@ export default function Home() {
 
       {/* ── Hero & Live Debate Monitor (Task 1 & 7) ─────────────────────── */}
       <section className="relative min-h-screen flex flex-col items-center justify-center p-8 overflow-hidden bg-black/10">
-        <PixelArena />
+        {!isMobile && <PixelArena />}
         <PixelParticlesBg />
 
         {/* Floating background retro decoration */}

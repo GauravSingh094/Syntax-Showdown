@@ -58,6 +58,11 @@ body {
   background-size: 100% 3px, 3px 100%;
   pointer-events: none;
 }
+@media (max-width: 767px) {
+  .crt-overlay::after {
+    display: none !important;
+  }
+}
 
 /* ─── 8-Bit Button ───────────────────────────────────────────────────────── */
 .pixel-button {

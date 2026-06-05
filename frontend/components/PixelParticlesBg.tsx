@@ -32,8 +32,10 @@ export default function PixelParticlesBg() {
     }> = [];
 
     const colors = ["#818cf8", "#34d399", "#fbbf24", "#38bdf8"];
-    // 35 square particles for perfect balance of visual depth and performance
-    for (let i = 0; i < 35; i++) {
+    // Scale particle count dynamically based on mobile vs desktop to optimize rendering
+    const particleCount = width < 768 ? 15 : 35;
+    
+    for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
