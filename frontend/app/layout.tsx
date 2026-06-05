@@ -11,6 +11,7 @@ import LoginButton from "@/components/LoginButton"
 import PageTransition from "@/components/PageTransition"
 import MobileMenu from "@/components/MobileMenu"
 import Footer from "@/components/Footer"
+import BootLoader from "@/components/BootLoader"
 
 export const metadata: Metadata = {
   title: "Syntax Showdown | Pixel AI Debate Arena",
@@ -47,6 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <ClerkProvider>
       <html lang="en">
         <body className="bg-gray-100 dark:bg-gray-950 text-gray-900 dark:text-gray-100 min-h-screen font-body antialiased overflow-x-hidden selection:bg-indigo-500/30 crt-overlay pixel-grid">
+          <BootLoader />
           <CustomCursor />
 
           <header className="sticky top-0 z-50 w-full flex items-center justify-between p-4 px-4 md:px-8 border-b-4 border-black bg-white dark:bg-gray-900 shadow-[0_4px_0_0_rgba(0,0,0,1)] overflow-hidden">
