@@ -22,20 +22,24 @@ export default function BootLoader() {
     // Lock body scrolling during load
     document.body.style.overflow = "hidden";
 
+    const duration = 4000; // 4 seconds total
+    const intervalTime = 40; // 40ms updates
+    const totalSteps = duration / intervalTime; // 100 updates
+    let currentStep = 0;
+
     const progressInterval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(progressInterval);
-          setTimeout(() => {
-            setLoading(false);
-            document.body.style.overflow = "";
-          }, 300); // Small pause at 100%
-          return 100;
-        }
-        const increment = Math.floor(Math.random() * 12) + 6;
-        return Math.min(prev + increment, 100);
-      });
-    }, 100);
+      currentStep++;
+      const progressPercent = Math.min((currentStep / totalSteps) * 100, 100);
+      setProgress(Math.round(progressPercent));
+
+      if (progressPercent >= 100) {
+        clearInterval(progressInterval);
+        setTimeout(() => {
+          setLoading(false);
+          document.body.style.overflow = "";
+        }, 300); // Small pause at 100%
+      }
+    }, intervalTime);
 
     const dotsInterval = setInterval(() => {
       setDots((prev) => (prev.length >= 3 ? "" : prev + "."));
