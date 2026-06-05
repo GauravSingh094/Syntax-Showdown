@@ -3,13 +3,14 @@ import { auth } from "@clerk/nextjs/server"
 import "./globals.css"
 import Link from "next/link"
 import { Metadata } from "next"
-import { Gamepad2, Globe, Cpu, MessageSquare } from "lucide-react"
+import { Gamepad2 } from "lucide-react"
 import CustomCursor from "@/components/CustomCursor"
 import ThemeToggle from "@/components/ThemeToggle"
 import SoundToggle from "@/components/SoundToggle"
 import LoginButton from "@/components/LoginButton"
 import PageTransition from "@/components/PageTransition"
 import MobileMenu from "@/components/MobileMenu"
+import Footer from "@/components/Footer"
 
 export const metadata: Metadata = {
   title: "Syntax Showdown | Pixel AI Debate Arena",
@@ -98,39 +99,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               {children}
             </PageTransition>
           </main>
-
-          <footer className="bg-gray-900 border-t-4 border-black p-12 mt-20 relative z-10 shadow-[0_-4px_0_0_rgba(0,0,0,1)]">
-            <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
-              <div className="col-span-2">
-                <h3 className="font-pixel text-lg mb-6 text-indigo-400 uppercase tracking-widest">Syntax Showdown</h3>
-                <p className="text-gray-400 font-body text-sm max-w-sm leading-relaxed">
-                  The world's first multi-agent AI debate arena with 8-bit aesthetics. Built for the future of competitive cognition.
-                </p>
-              </div>
-              <div>
-                <h4 className="font-silk text-xs mb-6 uppercase tracking-[0.2em] text-white">Navigation</h4>
-                <ul className="flex flex-col gap-4 text-sm text-gray-500 font-body uppercase tracking-wider">
-                  <li><Link href="/"        className="hover:text-white transition-colors" data-cursor-hover>Home</Link></li>
-                  <li><Link href="/leaderboard" className="hover:text-white transition-colors" data-cursor-hover>Leaderboard</Link></li>
-                  <li><Link href="/search"  className="hover:text-white transition-colors" data-cursor-hover>Search</Link></li>
-                  <li><Link href="/arena"   className="hover:text-white transition-colors" data-cursor-hover>Arena</Link></li>
-                  <li><Link href="/history" className="hover:text-white transition-colors" data-cursor-hover>History</Link></li>
-                </ul>
-              </div>
-              <div>
-                <h4 className="font-silk text-xs mb-6 uppercase tracking-[0.2em] text-white">Socials</h4>
-                <div className="flex gap-4">
-                  <a href="#" className="p-2 bg-gray-800 border-2 border-black hover:bg-indigo-600 transition-colors glow-indigo" data-cursor-hover><Cpu className="w-5 h-5" /></a>
-                  <a href="#" className="p-2 bg-gray-800 border-2 border-black hover:bg-indigo-600 transition-colors glow-indigo" data-cursor-hover><Globe className="w-5 h-5" /></a>
-                  <a href="#" className="p-2 bg-gray-800 border-2 border-black hover:bg-indigo-600 transition-colors glow-indigo" data-cursor-hover><MessageSquare className="w-5 h-5" /></a>
-                </div>
-              </div>
-            </div>
-            <div className="max-w-6xl mx-auto mt-12 pt-8 border-t-2 border-black flex flex-col md:row justify-between items-center text-[10px] font-pixel text-gray-600 uppercase tracking-tighter">
-              <p>© 2026 Syntax Showdown — All pixels protected.</p>
-              <p className="mt-4 md:mt-0">Made with ❤️ for AI Enthusiasts</p>
-            </div>
-          </footer>
+          <Footer />
         </body>
       </html>
     </ClerkProvider>
