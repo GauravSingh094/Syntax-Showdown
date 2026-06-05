@@ -82,6 +82,7 @@ async def get_debate_by_id(debate_id: str) -> Optional[dict]:
         obj["model_used"] = mid.get("model_used", "unknown")
         obj["cost"] = mid.get("cost", 0.0)
         obj["latency_ms"] = mid.get("latency_ms", 0.0)
+        obj["user_id"] = mid.get("user_id", "unknown")
         return obj
     except Exception as e:
         return None

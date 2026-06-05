@@ -26,6 +26,9 @@ class Settings(BaseSettings):
     CLERK_SECRET_KEY: str
     CLERK_JWKS_URL: str
 
+    # CORS Whitelist
+    ALLOWED_ORIGINS: list[str] = ["http://localhost:3000", "https://syntax-showdown-arena.vercel.app"]
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 settings = Settings()

@@ -4,8 +4,10 @@ from app.llm.provider_manager import llm_manager
 
 router = APIRouter()
 
+from pydantic import BaseModel, Field
+
 class TestRequest(BaseModel):
-    provider: str
+    provider: str = Field(..., pattern="^(groq|openrouter|gemini|openai)$")
 
 @router.post("/llm/test")
 async def test_llm_provider(req: TestRequest):

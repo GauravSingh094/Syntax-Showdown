@@ -8,7 +8,7 @@ from app.auth.clerk_middleware import get_current_user
 from app.core.security import validate_topic
 from app.memory.chromadb_client import store_debate
 from app.core.rate_limiter import check_rate_limit
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 from app.agents.side_agent import SideAgent
 from app.llm.provider_manager import debate_calls_context, selected_models_context
 from typing import Optional
@@ -17,12 +17,23 @@ router = APIRouter()
 side_agent = SideAgent()
 
 class DebateRequest(BaseModel):
-    topic: str
-    rounds: int = 3
-    mode: str = "classic"
-    pro_model: Optional[str] = "LLAMA-3.3"
-    opponent_model: Optional[str] = "DEEPSEEK-R1"
-    judge_model: Optional[str] = "GEMINI-2.0"
+    topic: str = Field(..., min_length=3, max_length=250)
+    rounds: int = Field(default=3, ge=1, le=5)
+    mode: str = Field(default="classic", pattern="^(classic|speed|blind)$")
+    pro_model: Optional[str] = Field(default="LLAMA-3.3")
+    opponent_model: Optional[str] = Field(default="DEEPSEEK-R1")
+    judge_model: Optional[str] = Field(default="GEMINI-2.0")
+
+    @field_validator("pro_model", "opponent_model", "judge_model")
+    @classmethod
+    def validate_models(cls, v: Optional[str]) -> Optional[str]:
+        if not v:
+            return v
+        allowed = {"LLAMA-3.3", "DEEPSEEK-R1", "GPT-4O", "GEMINI-2.0", "CLAUDE-3.5"}
+        val = v.upper().strip()
+        if val not in allowed:
+            raise ValueError(f"Model '{v}' is not supported. Allowed: {list(allowed)}")
+        return val
 
 def _sse(payload: dict) -> str:
     """Emit one SSE event and log it to stdout."""

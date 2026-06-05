@@ -32,16 +32,21 @@ async def lifespan(app: FastAPI):
     yield
 
 from fastapi.middleware.cors import CORSMiddleware
+from app.core.rate_limiter import RateLimiterMiddleware
 
 app = FastAPI(title="Syntax Showdown", lifespan=lifespan)
 
+# CORS configuration - restricting wildcard origins (Rule 6)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, specify the actual frontend URL
+    allow_origins=settings.ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Rate Limiting configuration (Rule 2)
+app.add_middleware(RateLimiterMiddleware)
 
 app.include_router(debate.router)
 app.include_router(history.router)

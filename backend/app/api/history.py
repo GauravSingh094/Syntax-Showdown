@@ -81,6 +81,8 @@ async def fetch_debate_authenticated(debate_id: str, user=Depends(get_current_us
     debate = await get_debate_by_id(debate_id)
     if not debate:
         raise HTTPException(status_code=404, detail="Debate not found")
+    if debate.get("user_id") != user.id:
+        raise HTTPException(status_code=403, detail="Forbidden: You do not own this resource")
     return {"debate": debate}
 
 @router.get("/debate/public/{debate_id}")
