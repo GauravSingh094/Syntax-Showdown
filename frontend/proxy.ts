@@ -8,8 +8,10 @@ const clerkProxy = clerkMiddleware(async (auth, request) => {
   }
 })
 
+export default clerkProxy
+
 export function proxy(request: any, event: any) {
-  return clerkProxy(request, event);
+  return clerkProxy(request, event)
 }
 
 export const config = {

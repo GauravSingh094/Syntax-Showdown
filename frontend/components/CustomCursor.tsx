@@ -1,46 +1,118 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useSpring, useMotionValue } from "framer-motion";
 
 export default function CustomCursor() {
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
+  const mouseX = useMotionValue(-100);
+  const mouseY = useMotionValue(-100);
+  const [hovered, setHovered] = useState(false);
+  const [clicked, setClicked] = useState(false);
+  const [visible, setVisible] = useState(false);
 
-  const springConfig = { damping: 25, stiffness: 700 };
-  const cursorX = useSpring(mouseX, springConfig);
-  const cursorY = useSpring(mouseY, springConfig);
+  // Outer ring — laggy spring for smooth delay follow
+  const outerX = useSpring(mouseX, { stiffness: 90,  damping: 22, mass: 0.5 });
+  const outerY = useSpring(mouseY, { stiffness: 90,  damping: 22, mass: 0.5 });
+
+  // Inner dot — fast spring
+  const innerX = useSpring(mouseX, { stiffness: 700, damping: 32 });
+  const innerY = useSpring(mouseY, { stiffness: 700, damping: 32 });
 
   useEffect(() => {
-    const moveCursor = (e: MouseEvent) => {
-      // Use 12px offset for a 24px wide cursor
-      mouseX.set(e.clientX - 12);
-      mouseY.set(e.clientY - 12);
+    const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
+    if (isTouchDevice) return;
+
+    const INTERACTIVE = "a, button, input, select, textarea, [data-cursor-hover], [role='button'], label, select option";
+
+    const onMove = (e: MouseEvent) => {
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
+      setVisible(true);
+    };
+    const onLeave  = () => setVisible(false);
+    const onEnter  = () => setVisible(true);
+    const onDown   = () => setClicked(true);
+    const onUp     = () => setClicked(false);
+
+    const onHoverIn  = (e: MouseEvent) => {
+      if ((e.target as Element)?.closest(INTERACTIVE)) setHovered(true);
+    };
+    const onHoverOut = (e: MouseEvent) => {
+      if ((e.target as Element)?.closest(INTERACTIVE)) setHovered(false);
     };
 
-    window.addEventListener("mousemove", moveCursor);
-    return () => window.removeEventListener("mousemove", moveCursor);
+    window.addEventListener("mousemove",  onMove,    { passive: true });
+    window.addEventListener("mouseleave", onLeave);
+    window.addEventListener("mouseenter", onEnter);
+    window.addEventListener("mousedown",  onDown);
+    window.addEventListener("mouseup",    onUp);
+    document.addEventListener("mouseover",  onHoverIn,  { passive: true });
+    document.addEventListener("mouseout",   onHoverOut, { passive: true });
+
+    return () => {
+      window.removeEventListener("mousemove",  onMove);
+      window.removeEventListener("mouseleave", onLeave);
+      window.removeEventListener("mouseenter", onEnter);
+      window.removeEventListener("mousedown",  onDown);
+      window.removeEventListener("mouseup",    onUp);
+      document.removeEventListener("mouseover",  onHoverIn);
+      document.removeEventListener("mouseout",   onHoverOut);
+    };
   }, [mouseX, mouseY]);
 
+  // Outer square ring size & style (Retro Voxel Crosshair)
+  const outerSize = clicked ? 18 : hovered ? 46 : 28;
+  const outerBorder = hovered
+    ? "2px solid #22d3ee" // Cyan glowing border on hover
+    : "2px solid #6366f1"; // Indigo border default
+  const outerBg = hovered ? "rgba(99,102,241,0.15)" : "transparent";
+  const rotation = hovered ? 45 : 0; // Rotates 45deg to form a diamond on hover!
+
   return (
-    <>
-      {/* Outer Hollow Box */}
+    <div className="hidden md:block">
+      {/* Outer lagging square */}
       <motion.div
         style={{
-          translateX: cursorX,
-          translateY: cursorY,
+          x: outerX,
+          y: outerY,
+          translateX: "-50%",
+          translateY: "-50%",
+          width:  outerSize,
+          height: outerSize,
+          border: outerBorder,
+          background: outerBg,
+          rotate: rotation,
+          borderRadius: "0px", // Strict retro square/pixel aesthetic
+          opacity: visible ? 1 : 0,
         }}
-        className="fixed top-0 left-0 w-6 h-6 rounded-none border-2 border-indigo-500 pointer-events-none z-[9999] hidden md:block mix-blend-difference opacity-80"
+        animate={{
+          width: outerSize,
+          height: outerSize,
+          rotate: rotation,
+          boxShadow: hovered ? "0 0 16px rgba(34,211,238,0.5)" : "none"
+        }}
+        transition={{ type: "spring", stiffness: 220, damping: 20 }}
+        className="fixed top-0 left-0 pointer-events-none z-[9999] mix-blend-difference"
       />
-      {/* Inner Precise Dot */}
+
+      {/* Inner instant pixel dot */}
       <motion.div
         style={{
-          translateX: cursorX,
-          translateY: cursorY,
-          x: 10, // Center dot (6px box, 2px dot -> (24-4)/2)
-          y: 10,
+          x: innerX,
+          y: innerY,
+          translateX: "-50%",
+          translateY: "-50%",
+          width: clicked ? "4px" : "6px",
+          height: clicked ? "4px" : "6px",
+          borderRadius: "0px", // Strict retro square dot
+          opacity: visible ? 1 : 0,
         }}
-        className="fixed top-0 left-0 w-1 h-1 bg-white pointer-events-none z-[9999] hidden md:block mix-blend-difference"
+        animate={{
+          width: clicked ? "4px" : "6px",
+          height: clicked ? "4px" : "6px",
+        }}
+        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+        className="fixed top-0 left-0 pointer-events-none z-[9999] bg-white mix-blend-difference"
       />
-    </>
+    </div>
   );
 }

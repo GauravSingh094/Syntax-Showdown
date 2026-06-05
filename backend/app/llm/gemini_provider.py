@@ -1,6 +1,7 @@
 import time
 import httpx
 import logging
+from typing import Optional
 from app.llm.base import BaseLLMProvider, LLMResponse, TokenUsage
 from app.config.settings import settings
 
@@ -26,11 +27,12 @@ class GeminiProvider(BaseLLMProvider):
             output_rate = 0.30 / 1_000_000
         return (input_tokens * input_rate) + (output_tokens * output_rate)
 
-    async def generate(self, prompt: str, role: str, format_json: bool = False) -> LLMResponse:
+    async def generate(self, prompt: str, role: str, format_json: bool = False, model: Optional[str] = None) -> LLMResponse:
         if not settings.GEMINI_API_KEY:
             raise ValueError("GEMINI_API_KEY is not configured")
 
-        model = self.get_model(role)
+        if not model:
+            model = self.get_model(role)
         # Using OpenAI-compatible endpoint for seamless integration
         url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
         headers = {

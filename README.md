@@ -1,34 +1,89 @@
-# Syntax Showdown ⚔️
+# ⚔️ Syntax Showdown
 
-**Syntax Showdown** is a high-performance, multi-agent AI debate platform. It pits advanced LLMs against each other in real-time moderated debates, adjudicated by a third impartial "Judge" agent. 
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js" alt="Next.js Badge"/>
+  <img src="https://img.shields.io/badge/FastAPI-0.110-emerald?style=for-the-badge&logo=fastapi" alt="FastAPI Badge"/>
+  <img src="https://img.shields.io/badge/LangGraph-State%20Engine-blue?style=for-the-badge&logo=langchain" alt="LangGraph Badge"/>
+  <img src="https://img.shields.io/badge/Tailwind-CSS-38bdf8?style=for-the-badge&logo=tailwind-css" alt="Tailwind CSS Badge"/>
+</p>
 
-Built with a **Multi-Provider Cloud LLM Engine**, the system leverages high-performance cloud providers with automatic dynamic failover chains to ensure high availability and robust reasoning. It uses **LangGraph** for complex state orchestration, **Server-Sent Events (SSE)** for real-time live streaming of the debate flow, and offers comprehensive cost and token observability telemetry.
+**Syntax Showdown** is a premium, real-time, multi-agent AI debate platform. It pits advanced LLMs against each other in structured, moderated battles adjudicated by an impartial AI "Judge" agent.
 
----
-
-## 🚀 Features
-
-- **Multi-Agent Orchestration**: Powered by LangGraph to manage the state machine of Pro, Opponent, and Judge nodes.
-- **Multi-Provider Cloud LLM Engine**: Native support for **Groq**, **OpenRouter**, **Gemini**, and **OpenAI** cloud providers, moving beyond local-only execution.
-- **Dynamic Failover & Resilience**: Configurable failover chains (e.g., Groq ➔ OpenRouter ➔ Gemini ➔ OpenAI) automatically route requests to fallback providers on rate limits or service disruptions. Includes structured audit logs for failover events.
-- **Cost & Token Observability**: Comprehensive telemetry tracking latency, token usage (input/output/total), request costs, active debate costs, and cumulative session costs.
-- **Diagnostics API**: Dedicated `/llm/test` healthcheck endpoint to verify credentials, model accessibility, and response health for all integrated providers.
-- **Real-Time Streaming**: Watch the debate unfold word-by-word via Server-Sent Events (SSE).
-- **Memory Persistence**: Powered by **ChromaDB Cloud** vector database, allowing users to save and search their entire debate history.
-- **Premium UI**: A glassmorphic, dark-themed dashboard built with Next.js 15, Framer Motion, and Tailwind CSS.
-- **Secure Auth**: Full user authentication and route protection via **Clerk**.
+The platform utilizes **LangGraph** for complex state orchestration, streams results using **Server-Sent Events (SSE)**, maintains historical records in **ChromaDB Cloud**, and features comprehensive cost and token observability telemetry.
 
 ---
 
-## 🛠️ Tech Stack
+## ⚡ Data Flow Architecture
 
-| Layer | Technology |
-|---|---|
-| **Frontend** | Next.js 15 (App Router), Tailwind CSS, Framer Motion, Zustand |
-| **Backend** | FastAPI (Python 3.10+), LangGraph, Pydantic |
-| **AI Engine** | Multi-Provider Cloud LLMs (Groq, OpenRouter, Gemini, OpenAI) |
-| **Database** | ChromaDB Cloud (Vector store for debate history) |
-| **Auth** | Clerk (JWT-based session management) |
+The data flow is fully unified and standardized across every layer:
+
+```mermaid
+graph TD
+    subgraph Backend
+        Provider[LLM Provider - Groq/OpenRouter/Gemini/OpenAI] -->|1. Returns LLMResponse| LangGraph[LangGraph State Engine - orchestrator.py]
+        LangGraph -->|2. Appends msg to rounds_data| SSE[FastAPI SSE Server - debate.py]
+    end
+    subgraph Frontend
+        SSE -->|3. Streams SSE chunk| Parser[JSON Stream Parser - page.tsx]
+        Parser -->|4. Validates msg schema| Store[Zustand Store - debateStore.ts]
+        Store -->|5. Triggers Reactive State| UI[React UI Rendering Card - page.tsx]
+    end
+
+    style Provider fill:#4f46e5,stroke:#fff,stroke-width:2px,color:#fff
+    style LangGraph fill:#0ea5e9,stroke:#fff,stroke-width:2px,color:#fff
+    style SSE fill:#0891b2,stroke:#fff,stroke-width:2px,color:#fff
+    style Parser fill:#0d9488,stroke:#fff,stroke-width:2px,color:#fff
+    style Store fill:#10b981,stroke:#fff,stroke-width:2px,color:#fff
+    style UI fill:#8b5cf6,stroke:#fff,stroke-width:2px,color:#fff
+```
+
+---
+
+## 📋 Standardized Message Schema
+
+Every message in the system conforms to the exact same JSON schema. This ensures zero data loss and flawless card rendering:
+
+```json
+{
+  "id": "string (UUID v4 or unique identifier)",
+  "role": "string ('pro' | 'opponent' | 'judge' | 'system' | 'error' | 'sides')",
+  "content": "string (canonical content; JSON-stringified for complex structures like judge/sides)",
+  "round": "number (integer; current round number)",
+  "provider": "string (active LLM provider, e.g. 'groq')",
+  "timestamp": "string (ISO-8601 UTC timestamp)"
+}
+```
+
+### Content Structures
+- **Arguments (`pro` / `opponent`)**: Raw markdown or text bullet points.
+- **Debate Briefing (`sides`)**: JSON-stringified object containing:
+  ```json
+  { "pro": "Pro side stance", "opponent": "Opponent side stance" }
+  ```
+- **Judge Adjudication (`judge`)**: JSON-stringified object containing:
+  ```json
+  {
+    "winner": "Pro | Opponent",
+    "scores": {
+      "Pro": { "logic": 1-10, "evidence": 1-10, "rebuttal": 1-10 },
+      "Opponent": { "logic": 1-10, "evidence": 1-10, "rebuttal": 1-10 }
+    },
+    "pro_summary": ["Point 1", "Point 2", "Point 3"],
+    "opponent_summary": ["Point 1", "Point 2", "Point 3"],
+    "reason": "Clash point details..."
+  }
+  ```
+
+---
+
+## 🚀 Key Features
+
+- **Multi-Agent Orchestration**: LangGraph coordinates the state machine (Pro ➔ Opponent ➔ Judge).
+- **Dynamic Failover Chain**: Automatically fails over (Groq ➔ OpenRouter ➔ Gemini ➔ OpenAI) on rate limits (HTTP 429) or service outages with failover audit logs.
+- **Local Heuristics Fallback**: If all LLM APIs fail, a fallback heuristic evaluation engine calculates the winner locally from token/word metrics without crashing the debate.
+- **Cost & Token Observability**: Tracks latency, prompt/completion tokens, request costs, debate costs, and cumulative session costs.
+- **Memory Persistence**: Integrates ChromaDB Cloud to persist, retrieve, and search debate history.
+- **Cyberpunk UI**: Responsive dark/glassmorphic interface with Framer Motion animations.
 
 ---
 
@@ -39,25 +94,20 @@ Built with a **Multi-Provider Cloud LLM Engine**, the system leverages high-perf
 - **Python**: v3.10+
 
 ### 2. Environment Configuration
-You will need to set up environment variables for both the frontend and backend. See the `.env.example` files in each directory.
 
 #### Backend (`/backend/.env`)
 ```env
-# Cloud LLM Routing Configuration
 PRIMARY_PROVIDER=groq
 ENABLE_FAILOVER=true
 
-# Cloud LLM API Keys
 GROQ_API_KEY=your_groq_api_key_here
 OPENROUTER_API_KEY=your_openrouter_api_key_here
 GEMINI_API_KEY=your_gemini_api_key_here
 OPENAI_API_KEY=your_openai_api_key_here
 
-# Clerk Authentication (Required for JWT Verification)
 CLERK_SECRET_KEY=sk_test_...
 CLERK_JWKS_URL=https://.../.well-known/jwks.json
 
-# ChromaDB Cloud (Vector Storage for History)
 CHROMA_HOST=api.trychroma.com
 CHROMA_API_KEY=ck-...
 CHROMA_TENANT=your_tenant_id_here
@@ -75,30 +125,29 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 
 ## 🏃 Running the Project
 
-### Start the Backend
-1. Navigate to the backend folder:
+### Start the Backend FastAPI Server
+1. Navigate to `/backend`:
    ```bash
    cd backend
    ```
-2. Set up and activate python virtual environment:
+2. Activate virtual environment:
    ```bash
-   python -m venv venv
-   # On Windows:
+   # Windows
    .\venv\Scripts\activate
-   # On macOS/Linux:
+   # macOS/Linux
    source venv/bin/activate
    ```
 3. Install dependencies:
    ```bash
    pip install -r requirements.txt
    ```
-4. Start the development server:
+4. Run:
    ```bash
    uvicorn app.main:app --reload
    ```
 
-### Start the Frontend
-1. Navigate to the frontend folder:
+### Start the Next.js Frontend
+1. Navigate to `/frontend`:
    ```bash
    cd frontend
    ```
@@ -106,20 +155,18 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
    ```bash
    npm install
    ```
-3. Start the Next.js dev server:
+3. Run:
    ```bash
    npm run dev
    ```
 
-Visit `http://localhost:3000` to witness the showdown.
+Frontend is accessible at [http://localhost:3000](http://localhost:3000), backend API at [http://localhost:8000](http://localhost:8000).
 
 ---
 
 ## 🧪 Testing
 
-The backend includes a dedicated unit and integration testing suite for verifying failover behavior, telemetry, and fallback routing mechanisms.
-
-To run the failover and provider chain tests:
+Run backend tests verifying failover behavior, telemetry logging, and local heuristic backups:
 ```bash
 cd backend
 pytest app/tests/test_llm_failover.py -v
@@ -127,10 +174,5 @@ pytest app/tests/test_llm_failover.py -v
 
 ---
 
-## 🔒 Security Notice
-The `.gitignore` is configured to ignore all `.env` files and `venv` directories. Never commit your API keys or Clerk secrets to public repositories. Use the provided `.env.example` files as templates.
-
----
-
-## 📜 License
+## 📜 License & Author
 MIT License. Created with ❤️ by Gaurav Singh.

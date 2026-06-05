@@ -26,7 +26,7 @@ class BaseLLMProvider:
             return self.judge_model
         return self.debate_model
 
-    async def generate(self, prompt: str, role: str, format_json: bool = False) -> LLMResponse:
+    async def generate(self, prompt: str, role: str, format_json: bool = False, model: Optional[str] = None) -> LLMResponse:
         raise NotImplementedError("Subclasses must implement generate")
 
     async def check_health(self) -> dict:
