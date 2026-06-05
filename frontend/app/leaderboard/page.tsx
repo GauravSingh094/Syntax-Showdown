@@ -144,20 +144,22 @@ export default function LeaderboardPage() {
         {/* ── Selection Tabs ─────────────────────────────────────────────── */}
         <div className="flex border-b-4 border-black bg-gray-900 overflow-hidden mb-8">
           {[
-            { id: "scores", label: "Highest Scoring Showdowns", icon: <Award className="w-4 h-4" /> },
-            { id: "topics", label: "Hot Topics Registry", icon: <Flame className="w-4 h-4" /> },
-            { id: "models", label: "Model Utilization Trends", icon: <Cpu className="w-4 h-4" /> },
+            { id: "scores", label: "Scores", fullLabel: "Highest Scoring Showdowns", icon: <Award className="w-4 h-4 shrink-0" /> },
+            { id: "topics", label: "Topics", fullLabel: "Hot Topics Registry", icon: <Flame className="w-4 h-4 shrink-0" /> },
+            { id: "models", label: "Models", fullLabel: "Model Utilization Trends", icon: <Cpu className="w-4 h-4 shrink-0" /> },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => handleTabChange(tab.id as any)}
-              className={`flex-1 py-4 px-3 font-silk text-[8px] md:text-[9px] uppercase tracking-widest flex items-center justify-center gap-2 cursor-pointer border-r-2 border-black last:border-r-0 transition-all ${
+              className={`flex-1 py-4 px-2 font-silk text-[8px] md:text-[9px] uppercase tracking-widest flex items-center justify-center gap-1.5 cursor-pointer border-r-2 border-black last:border-r-0 transition-all ${
                 activeTab === tab.id
                   ? "bg-indigo-600 text-white font-bold"
                   : "text-gray-500 hover:bg-gray-800 hover:text-gray-300"
               }`}
             >
-              {tab.icon} {tab.label}
+              {tab.icon} 
+              <span className="hidden sm:inline">{tab.fullLabel}</span>
+              <span className="inline sm:hidden">{tab.label}</span>
             </button>
           ))}
         </div>

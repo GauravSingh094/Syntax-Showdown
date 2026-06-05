@@ -9,6 +9,7 @@ import ThemeToggle from "@/components/ThemeToggle"
 import SoundToggle from "@/components/SoundToggle"
 import LoginButton from "@/components/LoginButton"
 import PageTransition from "@/components/PageTransition"
+import MobileMenu from "@/components/MobileMenu"
 
 export const metadata: Metadata = {
   title: "Syntax Showdown | Pixel AI Debate Arena",
@@ -60,32 +61,36 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               </span>
             </Link>
 
-            <nav className="flex items-center gap-4 md:gap-8 font-silk text-[10px] md:text-xs tracking-widest uppercase ml-4">
-              <Link href="/" className="hover:text-indigo-400 transition-colors hidden sm:block" data-cursor-hover>Home</Link>
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-8 font-silk text-xs tracking-widest uppercase ml-4 select-none">
+              <Link href="/" className="hover:text-indigo-400 transition-colors" data-cursor-hover>Home</Link>
               <Link href="/leaderboard" className="hover:text-indigo-400 transition-colors" data-cursor-hover>Leaderboard</Link>
-              <Link href="/search" className="hover:text-indigo-400 transition-colors hidden md:block" data-cursor-hover>Search</Link>
+              <Link href="/search" className="hover:text-indigo-400 transition-colors" data-cursor-hover>Search</Link>
 
               {userId ? (
                 <>
-                  <Link href="/dashboard" className="hover:text-indigo-400 transition-colors hidden md:block" data-cursor-hover>Dashboard</Link>
+                  <Link href="/dashboard" className="hover:text-indigo-400 transition-colors" data-cursor-hover>Dashboard</Link>
                   <Link href="/arena"     className="hover:text-indigo-400 transition-colors" data-cursor-hover>Arena</Link>
-                  <Link href="/history"   className="hover:text-indigo-400 transition-colors hidden sm:block" data-cursor-hover>History</Link>
-                  <div className="flex items-center gap-2 md:gap-4 ml-0 md:ml-2">
+                  <Link href="/history"   className="hover:text-indigo-400 transition-colors" data-cursor-hover>History</Link>
+                  <div className="flex items-center gap-4 ml-2">
                     <SoundToggle />
                     <ThemeToggle />
                     <div className="border-2 border-black p-0.5 bg-white shadow-[2px_2px_0_0_rgba(0,0,0,1)] flex items-center justify-center shrink-0">
-                      <UserButton appearance={{ elements: { avatarBox: "w-6 h-6 md:w-8 md:h-8 rounded-none", userButtonPopoverCard: "rounded-none border-4 border-black shadow-[8px_8px_0_0_#000]" } }} />
+                      <UserButton appearance={{ elements: { avatarBox: "w-8 h-8 rounded-none", userButtonPopoverCard: "rounded-none border-4 border-black shadow-[8px_8px_0_0_#000]" } }} />
                     </div>
                   </div>
                 </>
               ) : (
-                <div className="flex items-center gap-4 md:gap-6">
+                <div className="flex items-center gap-6">
                   <SoundToggle />
                   <ThemeToggle />
                   <LoginButton />
                 </div>
               )}
             </nav>
+
+            {/* Mobile Navigation */}
+            <MobileMenu />
           </header>
 
           <main className="relative min-h-[calc(100vh-200px)]">

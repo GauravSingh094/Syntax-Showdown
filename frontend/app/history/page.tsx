@@ -490,7 +490,7 @@ export default function HistoryPage() {
               animate={{ scale: 1,   y: 0,  filter: "blur(0px)" }}
               exit={{    scale: 0.9, y: 16, filter: "blur(2px)" }}
               transition={{ type: "spring", stiffness: 280, damping: 24 }}
-              className="bg-gray-900 border-8 border-black w-full max-w-4xl max-h-[90vh] flex flex-col shadow-[16px_16px_0_0_#000] overflow-hidden rounded-none"
+              className="bg-gray-900 border-4 sm:border-8 border-black w-full max-w-4xl max-h-[90vh] flex flex-col shadow-[8px_8px_0_0_#000] sm:shadow-[16px_16px_0_0_#000] overflow-hidden rounded-none"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Modal header */}
@@ -509,25 +509,27 @@ export default function HistoryPage() {
 
               {/* Winner banner */}
               {selected.verdict?.winner && (
-                <div className={`shrink-0 px-6 py-4 flex items-center gap-4 border-b-4 border-black ${
+                <div className={`shrink-0 p-5 sm:px-6 sm:py-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 border-b-4 border-black ${
                   selected.verdict.winner === "Pro"
                     ? "bg-gradient-to-r from-indigo-950 via-indigo-900/30 to-transparent"
                     : "bg-gradient-to-r from-emerald-950 via-emerald-900/30 to-transparent"
                 }`}>
-                  <div className={`p-2.5 border-2 border-black shadow-[3px_3px_0_0_rgba(0,0,0,1)] ${
-                    selected.verdict.winner === "Pro" ? "bg-indigo-600" : "bg-emerald-600"
-                  }`}>
-                    <Trophy className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="font-silk text-[7px] text-gray-400 uppercase tracking-widest">Verdict Outcome</p>
-                    <p className={`font-pixel text-base uppercase ${
-                      selected.verdict.winner === "Pro" ? "text-indigo-300" : "text-emerald-300"
+                  <div className="flex items-center gap-4 w-full sm:w-auto">
+                    <div className={`p-2.5 border-2 border-black shadow-[3px_3px_0_0_rgba(0,0,0,1)] shrink-0 ${
+                      selected.verdict.winner === "Pro" ? "bg-indigo-600" : "bg-emerald-600"
                     }`}>
-                      {selected.verdict.winner} Ascendant
-                    </p>
+                      <Trophy className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <p className="font-silk text-[7px] text-gray-400 uppercase tracking-widest">Verdict Outcome</p>
+                      <p className={`font-pixel text-base uppercase ${
+                        selected.verdict.winner === "Pro" ? "text-indigo-300" : "text-emerald-300"
+                      }`}>
+                        {selected.verdict.winner} Ascendant
+                      </p>
+                    </div>
                   </div>
-                  <div className="ml-auto flex items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto sm:ml-auto justify-end mt-2 sm:mt-0">
                     <button
                       onClick={startRewatch}
                       className="flex items-center gap-2 px-3 py-2 bg-purple-650 border-2 border-black font-silk text-[7px] text-white uppercase tracking-widest hover:bg-purple-550 transition-colors shadow-[2px_2px_0_0_#000] cursor-pointer font-bold"
@@ -536,7 +538,7 @@ export default function HistoryPage() {
                     </button>
                     <button
                       onClick={(e) => rerun(selected.topic, e)}
-                      className="flex items-center gap-1.5 px-3 py-2 bg-gray-800 border-2 border-black font-silk text-[7px] text-gray-300 uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-colors shadow-[2px_2px_0_0_#000] cursor-pointer"
+                      className="flex items-center gap-1.5 px-3 py-2 bg-gray-800 border-2 border-black font-silk text-[7px] text-gray-300 uppercase tracking-widest hover:bg-indigo-650 hover:text-white transition-colors shadow-[2px_2px_0_0_#000] cursor-pointer"
                     >
                       <RotateCcw className="w-3 h-3" /> Replay
                     </button>

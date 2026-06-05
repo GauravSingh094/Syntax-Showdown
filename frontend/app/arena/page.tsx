@@ -146,7 +146,7 @@ export default function ArenaPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4 md:p-6 h-[calc(100vh-100px)] flex gap-6 overflow-hidden">
+    <div className="max-w-7xl mx-auto p-4 md:p-6 w-full h-auto lg:h-[calc(100vh-100px)] flex flex-col lg:flex-row gap-6 overflow-y-auto lg:overflow-hidden">
       {/* Inline animations for sidebars */}
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes barPulse {
@@ -202,7 +202,7 @@ export default function ArenaPage() {
       </div>
 
       {/* MIDDLE CONTAINER: Debate Panel (Exact design preserved) */}
-      <div className="flex-1 flex flex-col overflow-hidden w-full">
+      <div className="flex-1 flex flex-col overflow-visible lg:overflow-hidden w-full">
         {/* Control Panel */}
         <div className="mb-8 flex flex-col md:flex-row gap-4 bg-gray-900 border-4 border-black p-6 shadow-[8px_8px_0_0_rgba(0,0,0,1)] relative z-10">
           <div className="flex-1 relative">
@@ -236,7 +236,7 @@ export default function ArenaPage() {
         </div>
 
         {/* Debate response panel (Untouched rendering card logic) */}
-        <div ref={scrollRef} className="flex-1 flex flex-col gap-8 overflow-y-auto overscroll-contain touch-auto pb-12 relative z-20 pr-4 scrollbar-thin scrollbar-thumb-indigo-600 scrollbar-track-transparent">
+        <div ref={scrollRef} className="flex-1 flex flex-col gap-8 overflow-y-visible lg:overflow-y-auto overscroll-contain touch-auto pb-12 relative z-20 pr-0 lg:pr-4 scrollbar-thin scrollbar-thumb-indigo-600 scrollbar-track-transparent">
           <AnimatePresence>
             {messages.length === 0 && !isDebating && (
                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-full flex items-center justify-center text-gray-700 flex-col gap-6">

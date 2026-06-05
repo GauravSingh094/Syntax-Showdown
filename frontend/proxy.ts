@@ -1,6 +1,13 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
-const isPublicRoute = createRouteMatcher(['/', '/api/health'])
+const isPublicRoute = createRouteMatcher([
+  '/', 
+  '/api/health',
+  '/sign-in(.*)',
+  '/sign-up(.*)',
+  '/leaderboard(.*)',
+  '/debate(.*)',
+])
 
 const clerkProxy = clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
@@ -15,5 +22,10 @@ export function proxy(request: any, event: any) {
 }
 
 export const config = {
-  matcher: ['/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|png|gif|svg)).*)','/(api|trpc)(.*)'],
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|png|gif|svg)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
 }

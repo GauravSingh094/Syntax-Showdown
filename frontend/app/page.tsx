@@ -158,16 +158,16 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex items-center justify-center gap-3 mb-8"
+            className="flex flex-wrap items-center justify-center gap-3 mb-8 px-4"
           >
-            <div className="flex items-center gap-2 bg-black/60 border border-indigo-500/40 px-4 py-2 backdrop-blur-sm shadow-[0_0_15px_rgba(99,102,241,0.15)]">
+            <div className="flex flex-wrap items-center justify-center gap-2 bg-black/60 border border-indigo-500/40 px-3 py-1.5 backdrop-blur-sm shadow-[0_0_15px_rgba(99,102,241,0.15)] text-[7px] xs:text-xs">
               <div className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 bg-emerald-400 animate-pulse shadow-[0_0_6px_#34d399]" />
                 <span className="font-silk text-[8px] text-emerald-400 uppercase tracking-widest font-bold">Online</span>
               </div>
               <div className="w-px h-3 bg-white/20" />
               <span className="font-silk text-[8px] text-gray-400 uppercase tracking-widest">Multi-Agent V2</span>
-              <div className="w-px h-3 bg-white/20" />
+              <div className="w-px h-3 bg-white/20 hidden xs:inline" />
               <span className="font-silk text-[8px] text-gray-400 uppercase tracking-widest font-bold text-indigo-400">Recruiter Showcase</span>
             </div>
           </motion.div>
@@ -177,7 +177,7 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="font-pixel text-4xl md:text-7xl lg:text-8xl mb-6 leading-tight text-white uppercase tracking-tighter"
+            className="font-pixel text-2xl xs:text-3xl sm:text-5xl md:text-7xl lg:text-8xl mb-6 leading-tight text-white uppercase tracking-tighter"
           >
             Witness the<br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-cyan-400 to-indigo-500 bg-[length:200%_auto] animate-shimmer drop-shadow-[4px_4px_0_rgba(0,0,0,1)] font-bold">
@@ -201,12 +201,12 @@ export default function Home() {
             </p>
           </motion.div>
 
-          {/* Dual CTA Magnetic Buttons (Task 5 & 12) */}
+          {/* Dual CTA Magnetic Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            className="flex flex-col sm:sm:row items-center justify-center gap-5 mb-12"
+            className="flex flex-col sm:flex-row items-center justify-center gap-5 mb-12"
           >
             <Link href="/arena" onClick={playClick}>
               <AnimatedButton size="lg" className="text-sm">
