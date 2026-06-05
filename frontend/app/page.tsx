@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import Link from "next/link";
-import { Zap, Brain, Terminal, Cpu, Sparkles, Shield, Scale, ChevronRight, Play, BarChart3, GitBranch } from "lucide-react";
+import { Zap, Brain, Terminal, Cpu, Sparkles, Shield, Scale, ChevronRight, Play, BarChart3, GitBranch, ChevronDown, HelpCircle, Activity, Database, Server } from "lucide-react";
 import Lenis from "lenis";
 import PixelArena from "@/components/PixelArena";
 import AnimatedButton from "@/components/AnimatedButton";
@@ -74,6 +74,181 @@ const TECH = [
   { label: "Next.js",    color: "bg-gray-600/20   border-gray-500/40   text-gray-300"   },
 ];
 
+const GLADIATORS = [
+  {
+    name: "Llama 3.3",
+    role: "The Logic Enforcer",
+    desc: "A powerhouse of strict logical flow and structural rigor. Excellent at unpacking complex arguments and highlighting technical fallacies.",
+    avatar: "🦙",
+    stats: [
+      { label: "Coherence", val: 95 },
+      { label: "Evidence Citation", val: 88 },
+      { label: "Rebuttal Speed", val: 82 },
+      { label: "Heuristics", val: 78 }
+    ],
+    color: "indigo",
+    glow: "hover:shadow-[0_0_20px_rgba(99,102,241,0.25)] hover:border-indigo-400/50"
+  },
+  {
+    name: "DeepSeek R1",
+    role: "The Deep Thinker",
+    desc: "Orchestrates long reasoning paths before outputting tokens. DeepSeek R1 handles complex conceptual rebuttals and outmaneuvers opponents structurally.",
+    avatar: "🐋",
+    stats: [
+      { label: "Coherence", val: 88 },
+      { label: "Evidence Citation", val: 92 },
+      { label: "Rebuttal Speed", val: 75 },
+      { label: "Heuristics", val: 95 }
+    ],
+    color: "emerald",
+    glow: "hover:shadow-[0_0_20px_rgba(16,185,129,0.25)] hover:border-emerald-400/50"
+  },
+  {
+    name: "Gemini 2.5",
+    role: "The Rhetoric Sage",
+    desc: "Maintains a balanced tone, presenting fluid arguments and clear summaries. Great at synthesis, logic adjudication, and human-like eloquence.",
+    avatar: "♊",
+    stats: [
+      { label: "Coherence", val: 90 },
+      { label: "Evidence Citation", val: 85 },
+      { label: "Rebuttal Speed", val: 94 },
+      { label: "Heuristics", val: 87 }
+    ],
+    color: "amber",
+    glow: "hover:shadow-[0_0_20px_rgba(234,179,8,0.25)] hover:border-amber-400/50"
+  }
+];
+
+const FAQS = [
+  {
+    q: "How is a winner decided in a debate?",
+    a: "Our Logic Adjudicator uses a multi-tier assessment criteria, scoring each agent out of 10 points across logic coherence, evidence citations, and rebuttal density. If the primary LLM provider fails, a dynamic local text heuristic takes over to count word count, citation density, and response volumes to guarantee a fair result."
+  },
+  {
+    q: "What role does LangGraph play in the orchestrator?",
+    a: "LangGraph manages the multi-agent cognitive loop. It compiles the debate state, routes execution from the user initialization node to the Pro and Opponent argument generator nodes, checks round limits, and pipes the final transcript to the Adjudicator node for live scoring."
+  },
+  {
+    q: "Why use Server-Sent Events (SSE) instead of standard REST?",
+    a: "Debate generation requires multiple LLM calls which can take up to 30 seconds. SSE allows the backend to stream tokens live as they are generated, giving you a real-time terminal feed of the arguments, round by round, with zero lag or page refreshes."
+  },
+  {
+    q: "Are the debates saved in a persistent database?",
+    a: "Yes! Every debate, round argument, and judge score sheet is saved in our backend vector database cluster (ChromaDB). This allows global keyword searches, scoring analytics, and direct rewatch telemetry on the Leaderboard and History panels."
+  }
+];
+
+function StatBar({ label, value, color }: { label: string; value: number; color: string }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true });
+  return (
+    <div ref={ref} className="mb-3">
+      <div className="flex justify-between font-silk text-[7px] uppercase tracking-wider mb-1">
+        <span className="text-gray-400">{label}</span>
+        <span className={
+          color === "indigo" ? "text-indigo-400" :
+          color === "emerald" ? "text-emerald-400" : "text-amber-400"
+        }>{value}%</span>
+      </div>
+      <div className="h-2 bg-black border border-gray-800 relative overflow-hidden">
+        <motion.div
+          className={
+            color === "indigo" ? "bg-indigo-500 h-full" :
+            color === "emerald" ? "bg-emerald-500 h-full" : "bg-amber-500 h-full"
+          }
+          initial={{ width: 0 }}
+          animate={inView ? { width: `${value}%` } : {}}
+          transition={{ duration: 1.2, ease: "easeOut", delay: 0.1 }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function FAQItem({ q, a }: { q: string; a: string }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const { playClick } = useSoundStore();
+  return (
+    <div className="border-4 border-black bg-gray-900 shadow-[4px_4px_0_0_rgba(0,0,0,1)] hover:border-indigo-500/40 transition-colors">
+      <button
+        onClick={() => { playClick(); setIsOpen(!isOpen); }}
+        className="w-full text-left p-5 flex items-center justify-between font-pixel text-xs text-white uppercase tracking-wider cursor-pointer select-none"
+      >
+        <span>{q}</span>
+        <motion.span
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          className="text-indigo-400 shrink-0 ml-4"
+        >
+          <ChevronDown className="w-4 h-4" />
+        </motion.span>
+      </button>
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: "easeInOut" }}
+            className="overflow-hidden border-t-2 border-black bg-black/20"
+          >
+            <p className="p-5 font-body text-sm text-gray-400 leading-relaxed">
+              {a}
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+function ArchitectureMap() {
+  return (
+    <div className="w-full bg-gray-900 border-4 border-black p-6 shadow-[8px_8px_0_0_rgba(0,0,0,1)] relative overflow-hidden">
+      <div className="scan-sweep opacity-10" />
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative z-10 font-silk text-[8px] uppercase tracking-widest text-center select-none font-bold">
+        
+        {/* Node 1 */}
+        <div className="flex flex-col items-center justify-center p-5 bg-indigo-950/20 border-2 border-indigo-500/30 relative shadow-[0_0_12px_rgba(99,102,241,0.1)] group hover:border-indigo-500 transition-colors">
+          <div className="w-10 h-10 border-2 border-black bg-indigo-600 flex items-center justify-center text-[16px] mb-3 group-hover:scale-105 transition-transform shadow-[2px_2px_0_#000]">💻</div>
+          <span className="text-white font-bold mb-1">Next.js Client</span>
+          <span className="text-gray-505 text-[6px] normal-case font-mono">React · Framer · Zustand</span>
+        </div>
+
+        {/* Node 2 */}
+        <div className="flex flex-col items-center justify-center p-5 bg-emerald-950/20 border-2 border-emerald-500/30 relative shadow-[0_0_12px_rgba(16,185,129,0.1)] group hover:border-emerald-500 transition-colors">
+          <div className="w-10 h-10 border-2 border-black bg-emerald-600 flex items-center justify-center text-[16px] mb-3 group-hover:scale-105 transition-transform shadow-[2px_2px_0_#000]">⚡</div>
+          <span className="text-white font-bold mb-1">FastAPI Backend</span>
+          <span className="text-gray-505 text-[6px] normal-case font-mono">Uvicorn · SSE Stream · CORS</span>
+        </div>
+
+        {/* Node 3 */}
+        <div className="flex flex-col items-center justify-center p-5 bg-purple-950/20 border-2 border-purple-500/30 relative shadow-[0_0_12px_rgba(168,85,247,0.1)] group hover:border-purple-500 transition-colors">
+          <div className="w-10 h-10 border-2 border-black bg-purple-650 flex items-center justify-center text-[16px] mb-3 group-hover:scale-105 transition-transform shadow-[2px_2px_0_#000]">🧠</div>
+          <span className="text-white font-bold mb-1">LangGraph Router</span>
+          <span className="text-gray-505 text-[6px] normal-case font-mono">Multi-Agent Loops · State Graph</span>
+        </div>
+
+        {/* Node 4 */}
+        <div className="flex flex-col items-center justify-center p-5 bg-amber-950/20 border-2 border-amber-500/30 relative shadow-[0_0_12px_rgba(234,179,8,0.1)] group hover:border-amber-500 transition-colors">
+          <div className="w-10 h-10 border-2 border-black bg-amber-600 flex items-center justify-center text-[16px] mb-3 group-hover:scale-105 transition-transform shadow-[2px_2px_0_#000]">🗄️</div>
+          <span className="text-white font-bold mb-1">ChromaDB DB</span>
+          <span className="text-gray-505 text-[6px] normal-case font-mono">Vector Embeddings · History logs</span>
+        </div>
+
+      </div>
+      
+      {/* SVG Connecting lines in background */}
+      <div className="absolute inset-0 pointer-events-none hidden md:block opacity-30">
+        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 180 82 L 280 82" stroke="#6366f1" strokeWidth="2" strokeDasharray="6 6" fill="none" />
+          <path d="M 460 82 L 560 82" stroke="#10b981" strokeWidth="2" strokeDasharray="6 6" fill="none" />
+          <path d="M 740 82 L 840 82" stroke="#a855f7" strokeWidth="2" strokeDasharray="6 6" fill="none" />
+        </svg>
+      </div>
+    </div>
+  );
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    HOME PAGE
    ══════════════════════════════════════════════════════════════════════════ */
@@ -114,6 +289,13 @@ export default function Home() {
         .typing-cursor-solid {
           animation: cyberBlink 0.6s steps(2, start) infinite;
         }
+        @keyframes scanSweep {
+          0% { transform: translateY(-20vh); }
+          100% { transform: translateY(100vh); }
+        }
+        .animate-scan-sweep {
+          animation: scanSweep 12s linear infinite;
+        }
       `}</style>
 
       {/* ── Boot Screen ──────────────────────────────────────────────────── */}
@@ -152,6 +334,33 @@ export default function Home() {
       <section className="relative min-h-screen flex flex-col items-center justify-center p-8 overflow-hidden bg-black/10">
         <PixelArena />
         <PixelParticlesBg />
+
+        {/* Floating background retro decoration */}
+        <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+          <motion.div
+            animate={{ y: [0, -15, 0], rotate: [0, 5, 0] }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-1/4 left-10 text-gray-700/20 text-4xl hidden md:block"
+          >
+            🎮
+          </motion.div>
+          <motion.div
+            animate={{ y: [0, 20, 0], rotate: [0, -8, 0] }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+            className="absolute bottom-1/4 right-12 text-gray-700/20 text-4xl hidden md:block"
+          >
+            ⚡
+          </motion.div>
+          <motion.div
+            animate={{ scale: [0.95, 1.05, 0.95] }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-12 right-1/4 text-gray-700/10 text-6xl hidden lg:block"
+          >
+            👾
+          </motion.div>
+          {/* Vertical Scanner Line sweep */}
+          <div className="absolute left-0 w-full h-[3px] bg-indigo-500/10 shadow-[0_0_8px_rgba(99,102,241,0.3)] animate-scan-sweep pointer-events-none" />
+        </div>
 
         <div className="max-w-5xl text-center z-10 relative mt-6">
           {/* Badge strip */}
@@ -314,6 +523,89 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ── Neural Gladiators Showcase (New Section) ─────────────────────── */}
+      <section className="max-w-7xl mx-auto px-6 md:px-8 py-24 relative z-10 border-t-4 border-black/40">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <p className="font-silk text-[9px] text-emerald-400 uppercase tracking-[0.4em] mb-4">NEURAL MATRIX ENGINE</p>
+          <h2 className="font-pixel text-2xl md:text-4xl text-white uppercase tracking-tighter font-bold">
+            Active Combat Nodes
+          </h2>
+          <p className="font-body text-gray-500 text-sm max-w-lg mx-auto mt-4 leading-relaxed">
+            Audit the specifications and cognitive ratings of our primary LLM orchestrator agents.
+          </p>
+        </motion.div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {GLADIATORS.map((glad, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.12, duration: 0.7 }}
+              whileHover={{ y: -8 }}
+              className={`bg-gray-900 border-4 border-black p-6 shadow-[8px_8px_0_0_rgba(0,0,0,1)] transition-all duration-300 ${glad.glow} flex flex-col justify-between relative`}
+            >
+              <div>
+                {/* Gladiator Header */}
+                <div className="flex items-center justify-between border-b-2 border-black pb-4 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gray-800 border-2 border-black flex items-center justify-center text-3xl shadow-[2px_2px_0_#000]">
+                      {glad.avatar}
+                    </div>
+                    <div>
+                      <h3 className="font-pixel text-sm text-white font-bold leading-none mb-1.5">{glad.name}</h3>
+                      <span className="font-silk text-[7px] text-gray-500 uppercase tracking-wider">{glad.role}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="font-body text-xs text-gray-400 leading-relaxed mb-6">
+                  {glad.desc}
+                </p>
+              </div>
+
+              {/* Stats Block */}
+              <div className="border-t-2 border-black/30 pt-4 mt-auto">
+                <span className="font-silk text-[7px] text-gray-500 uppercase tracking-widest block mb-3 font-bold">Cognitive Weights</span>
+                {glad.stats.map((st, idx) => (
+                  <StatBar key={idx} label={st.label} value={st.val} color={glad.color} />
+                ))}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── System Architecture Visual Grid (New Section) ───────────────── */}
+      <section className="max-w-7xl mx-auto px-6 md:px-8 py-20 relative z-10 border-t-4 border-black/40">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-12"
+        >
+          <p className="font-silk text-[9px] text-indigo-400 uppercase tracking-[0.4em] mb-4">TOPOLOGY DIAGRAM</p>
+          <h2 className="font-pixel text-2xl md:text-3xl text-white uppercase tracking-tighter font-bold">
+            Cognitive Pipeline Stack
+          </h2>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+        >
+          <ArchitectureMap />
+        </motion.div>
+      </section>
+
       {/* ── Social Proof / Tech Strip ────────────────────────────────────── */}
       <section className="border-y-4 border-black bg-gray-900 py-16 relative overflow-hidden">
         <div className="scan-sweep opacity-20" />
@@ -393,6 +685,38 @@ export default function Home() {
                 <p className="font-body text-sm text-gray-500 leading-relaxed">{s.desc}</p>
               </div>
               <ChevronRight className="w-5 h-5 text-gray-700 group-hover:text-indigo-400 group-hover:translate-x-1 transition-all mt-1 shrink-0" />
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── Interactive Intel Core FAQ (New Section) ────────────────────── */}
+      <section className="max-w-4xl mx-auto px-6 md:px-8 py-24 relative z-10 border-t-4 border-black/40">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <p className="font-silk text-[9px] text-amber-400 uppercase tracking-[0.4em] mb-4">INTEL DATABASE</p>
+          <h2 className="font-pixel text-2xl md:text-3xl text-white uppercase tracking-tighter font-bold">
+            System Specifications FAQ
+          </h2>
+          <p className="font-body text-gray-505 text-sm max-w-md mx-auto mt-4 leading-relaxed">
+            Expand nodes to audit operational logic, state machines, and API connections.
+          </p>
+        </motion.div>
+
+        <div className="space-y-4">
+          {FAQS.map((faq, idx) => (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.08 }}
+            >
+              <FAQItem q={faq.q} a={faq.a} />
             </motion.div>
           ))}
         </div>
