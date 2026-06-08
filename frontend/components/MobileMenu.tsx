@@ -56,7 +56,7 @@ export default function MobileMenu() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 top-[76px] z-[99] bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-[99] bg-black/60 backdrop-blur-sm"
             onClick={toggleMenu}
           >
             <motion.div
@@ -69,10 +69,17 @@ export default function MobileMenu() {
             >
               <div className="space-y-6">
                 {/* Section Header */}
-                <div className="border-b-2 border-black pb-3">
+                <div className="flex items-center justify-between border-b-2 border-black pb-3">
                   <span className="font-silk text-[8px] text-indigo-400 uppercase tracking-widest font-bold">
                     Navigation Menu
                   </span>
+                  <button
+                    onClick={toggleMenu}
+                    className="p-1 border-2 border-black bg-white dark:bg-gray-900 shadow-[2px_2px_0_0_#000] hover:shadow-[3px_3px_0_0_#000] active:translate-x-0.5 active:translate-y-0.5 active:shadow-[1px_1px_0_0_#000] transition-all flex items-center justify-center cursor-pointer text-gray-900 dark:text-white"
+                    aria-label="Close Menu"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
 
                 {/* Nav Links */}

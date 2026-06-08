@@ -78,7 +78,7 @@ export default function PublicDebatePage({ params }: { params: Promise<{ id: str
   useEffect(() => {
     async function fetchPublicDebate() {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/debate/public/${id}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://syntax-showdown.onrender.com"}/debate/public/${id}`);
         if (!res.ok) throw new Error("Debate not found");
         const data = await res.json();
         

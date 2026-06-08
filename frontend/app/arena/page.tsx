@@ -73,11 +73,23 @@ export default function ArenaPage() {
 
     try {
       const token = await getToken();
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/debate`, {
+      if (!token) throw new Error("AUTH_FAILED: Please sign in to start a debate.");
+
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://syntax-showdown.onrender.com';
+      const response = await fetch(`${apiUrl}/debate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ topic, rounds })
       });
+
+      if (!response.ok) {
+        const status = response.status;
+        if (status === 401 || status === 403) throw new Error("AUTH_EXPIRED: Session expired. Please sign in again.");
+        if (status === 429) throw new Error("RATE_LIMIT: Too many requests. Please wait a moment and try again.");
+        if (status === 422) throw new Error("INVALID_INPUT: Topic must be 3-250 characters.");
+        if (status >= 500) throw new Error("SERVER_DOWN: Backend is starting up — please retry in 30 seconds. (Render cold start)");
+        throw new Error(`SERVER_ERROR [${status}]: ${response.statusText}`);
+      }
 
       if (!response.body) throw new Error("No response body");
       const reader = response.body.getReader();
@@ -89,7 +101,13 @@ export default function ArenaPage() {
         const lines = decoder.decode(value).split('\n\n').filter(Boolean);
         for (const line of lines) {
           if (line.startsWith('data: ')) {
-            const data = JSON.parse(line.replace('data: ', ''));
+            let data;
+            try {
+              data = JSON.parse(line.replace('data: ', ''));
+            } catch {
+              console.error("Failed to parse SSE event:", line);
+              continue;
+            }
             
             // Runtime Validation
             if (!data || typeof data !== "object") {
@@ -133,10 +151,15 @@ export default function ArenaPage() {
         }
       }
     } catch (e: any) {
+      let errorMsg = e.message || "UPLINK FAILURE";
+      // Detect network/CORS errors from failed fetch
+      if (e instanceof TypeError && e.message === "Failed to fetch") {
+        errorMsg = "NETWORK ERROR: Cannot reach the server. It may be cold-starting — please retry in 30 seconds.";
+      }
       addMessage({
         id: `err-catch-${Date.now()}`,
         role: 'error',
-        content: e.message || "UPLINK FAILURE",
+        content: errorMsg,
         round: 0,
         provider: 'system',
         timestamp: new Date().toISOString()

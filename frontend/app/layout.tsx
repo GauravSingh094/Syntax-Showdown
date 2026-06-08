@@ -51,9 +51,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <BootLoader />
           <CustomCursor />
 
-          <header className="sticky top-0 z-50 w-full flex items-center justify-between p-4 px-4 md:px-8 border-b-4 border-black bg-white dark:bg-gray-900 shadow-[0_4px_0_0_rgba(0,0,0,1)] overflow-hidden">
+          <header className="sticky top-0 z-50 w-full flex items-center justify-between p-4 px-4 md:px-8 border-b-4 border-black bg-white dark:bg-gray-900 shadow-[0_4px_0_0_rgba(0,0,0,1)]">
             {/* Scan sweep inside header */}
-            <div className="scan-sweep opacity-30" />
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <div className="scan-sweep opacity-30" />
+            </div>
 
             <Link href="/" className="font-silk text-lg md:text-2xl tracking-tighter flex items-center gap-2 md:gap-3 shrink-0 hover:scale-105 transition-transform duration-75" data-cursor-hover>
               <div className="p-1 md:p-1.5 bg-indigo-600 border-2 border-black shadow-[2px_2px_0_0_rgba(0,0,0,1)]">

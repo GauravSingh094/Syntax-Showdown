@@ -169,7 +169,7 @@ export default function HistoryPage() {
       try {
         const token = await getToken();
         if (!token) return;
-        const res  = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/history`, {
+        const res  = await fetch(`${process.env.NEXT_PUBLIC_API_URL || "https://syntax-showdown.onrender.com"}/history`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();

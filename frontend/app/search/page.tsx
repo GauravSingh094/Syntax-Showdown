@@ -40,7 +40,7 @@ export default function SearchPage() {
       const token = await getToken();
       // Fetch user specific history as primary scope for global search
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/history`,
+        `${process.env.NEXT_PUBLIC_API_URL || "https://syntax-showdown.onrender.com"}/history`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (!res.ok) throw new Error("Failed to fetch debates");

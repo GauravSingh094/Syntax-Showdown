@@ -30,7 +30,7 @@ export default function LeaderboardPage() {
     try {
       setError(false);
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/history/leaderboard`
+        `${process.env.NEXT_PUBLIC_API_URL || "https://syntax-showdown.onrender.com"}/history/leaderboard`
       );
       if (!res.ok) throw new Error("Failed to fetch leaderboard data");
       const json = await res.json();
