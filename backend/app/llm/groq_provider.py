@@ -12,7 +12,7 @@ class GroqProvider(BaseLLMProvider):
         super().__init__(
             name="groq",
             debate_model="llama-3.3-70b-versatile",
-            judge_model="deepseek-r1-distill-llama-70b"
+            judge_model="llama-3.3-70b-versatile"
         )
 
     def _calculate_cost(self, model: str, input_tokens: int, output_tokens: int) -> float:

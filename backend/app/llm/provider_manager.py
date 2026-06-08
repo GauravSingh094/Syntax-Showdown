@@ -22,7 +22,7 @@ selected_models_context: ContextVar[Dict[str, str]] = ContextVar("selected_model
 MODEL_MAPPINGS = {
     "groq": {
         "LLAMA-3.3": "llama-3.3-70b-versatile",
-        "DEEPSEEK-R1": "deepseek-r1-distill-llama-70b",
+        "DEEPSEEK-R1": "llama-3.3-70b-versatile",
         "GPT-4O": "llama-3.3-70b-versatile",
         "GEMINI-2.0": "llama-3.3-70b-versatile"
     },
