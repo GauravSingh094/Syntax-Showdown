@@ -9,11 +9,17 @@ const isPublicRoute = createRouteMatcher([
   '/debate(.*)',
 ])
 
-export default clerkMiddleware(async (auth, request) => {
+const clerkProxy = clerkMiddleware(async (auth, request) => {
   if (!isPublicRoute(request)) {
     await auth.protect()
   }
 })
+
+export default clerkProxy
+
+export function proxy(request: any, event: any) {
+  return clerkProxy(request, event)
+}
 
 export const config = {
   matcher: [

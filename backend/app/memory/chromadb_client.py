@@ -7,12 +7,34 @@ from app.config.settings import settings
 
 load_dotenv()
 
-client = chromadb.CloudClient(
-    api_key=settings.CHROMA_API_KEY,
-    tenant=settings.CHROMA_TENANT,
-    database=settings.CHROMA_DATABASE,
-)
-collection = client.get_or_create_collection("debates")
+client = None
+collection = None
+
+try:
+    if settings.CHROMA_API_KEY and settings.CHROMA_API_KEY != "dummy":
+        client = chromadb.CloudClient(
+            api_key=settings.CHROMA_API_KEY,
+            tenant=settings.CHROMA_TENANT,
+            database=settings.CHROMA_DATABASE,
+        )
+        collection = client.get_or_create_collection("debates")
+        print("Connected to ChromaDB Cloud Client successfully.")
+    else:
+        raise ValueError("Chroma Cloud API Key is empty or dummy")
+except Exception as e:
+    print(f"ChromaDB CloudClient failed/not configured: {e}. Falling back to PersistentClient...")
+    try:
+        db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../../chromadb_data")
+        os.makedirs(db_path, exist_ok=True)
+        client = chromadb.PersistentClient(path=db_path)
+        collection = client.get_or_create_collection("debates")
+        print(f"Connected to local persistent ChromaDB at {db_path} successfully.")
+    except Exception as local_err:
+        print(f"Local ChromaDB PersistentClient failed: {local_err}. Falling back to EphemeralClient...")
+        client = chromadb.EphemeralClient()
+        collection = client.get_or_create_collection("debates")
+        print("Connected to Ephemeral (in-memory) ChromaDB successfully.")
+
 
 async def store_debate(
     user_id: str,
