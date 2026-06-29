@@ -175,4 +175,4 @@ pytest app/tests/test_llm_failover.py -v
 ---
 
 ## 📜 License & Author
-MIT License. Created with ❤️ by Gaurav Singh.
+MIT License. Created with ❤️ by Gaurav Singh & Himanshu Gautam.
